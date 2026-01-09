@@ -65,11 +65,11 @@ class AxiomLexer:
 
 
 if __name__ == "__main__":
-    lexer = AxiomLexer("10 20 30")
+    lexer = AxiomLexer("10 20 30 ")
     tokens = []
     for _ in range(4):  # 3 числа + EOF
         token = lexer.get_next_token()
         tokens.append(token)
         print(token)
 
-        # TODO: добавить обработку чисел с плавающей точкой (последнее сообщение в дипсик)
+        # TODO: 09.01.2026 добавить обработку чисел с плавающей точкой

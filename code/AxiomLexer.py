@@ -71,3 +71,5 @@ if __name__ == "__main__":
         token = lexer.get_next_token()
         tokens.append(token)
         print(token)
+
+        # TODO: добавить обработку чисел с плавающей точкой (последнее сообщение в дипсик)

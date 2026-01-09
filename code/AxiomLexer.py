@@ -43,10 +43,40 @@ class AxiomLexer:
 
     def read_number(self):
         result = ''
-        while self.current_char is not None and self.current_char.isdigit():
-            result += self.current_char
-            self.advance()
-        return AxiomTokenType.NUMBER, int(result)
+        has_dot = False
+
+        if self.current_char == '.':
+            # Проверяем следующий символ - если цифра, то это float
+            if self.peekPosition() and self.peekPosition().isdigit():
+                has_dot = True
+                result = '0.'  # Добавляем ведущий ноль
+                print(result)
+                self.advance()  # Пропускаем точку
+
+        while self.current_char is not None:
+
+            if self.current_char == '.': #
+                if has_dot == True: #
+                    self.error("Two dots in number!") # если точка встречается повторно, выводим ошибку
+                has_dot = True
+                result += '.'
+
+            elif self.current_char.isdigit(): # если символ число
+                result += self.current_char # добавляем его к нашему результату (возвращаемому значению)
+
+            else:
+                break # если проверяемый символ не точка и не число, то выходим
+
+            self.advance() # двигаемся вперед
+
+        # Проверяем, что число не состоит из одной точки
+        if result == '' or result == '0.':
+            self.error("Неверный формат числа")
+
+        if has_dot:
+            return AxiomTokenType.FLOAT, float(result) # если точка есть, возвращаем float
+        else:
+            return AxiomTokenType.NUMBER, int(result) # если точки нет, возвращаем int
 
     def get_next_token(self):
         while self.current_char is not None:  # пока символ который мы проверяем не равен None
@@ -57,7 +87,8 @@ class AxiomLexer:
                 self.skip_comment()  # то мы вызываем функцию для пропуска коммментов
                 continue  # continue начинает цикл заново с нового символа. Это гарантирует, что после пропуска пробелов/комментариев мы обработаем следующий значимый символ
 
-            if self.current_char.isdigit():
+            if (self.current_char.isdigit() or
+                    (self.current_char == '.' and self.peekPosition() and self.peekPosition().isdigit())):
                 token_type, velue = self.read_number()
                 return AxiomToken(token_type, velue, self.line)
 
@@ -65,11 +96,10 @@ class AxiomLexer:
 
 
 if __name__ == "__main__":
-    lexer = AxiomLexer("10 20 30 ")
+    lexer = AxiomLexer("0.5 #...1")
     tokens = []
-    for _ in range(4):  # 3 числа + EOF
-        token = lexer.get_next_token()
-        tokens.append(token)
-        print(token)
+    for _ in range(5):
+        tokens.append(lexer.get_next_token())
+    print(tokens)
 
-        # TODO: 09.01.2026 добавить обработку чисел с плавающей точкой
+        # TODO: 09.01.2026 добавить обработку чисел с плавающей точкой СДЕЛАНО

@@ -13,19 +13,21 @@ class AxiomTokenType(Enum):
     BOOL = 'BOOL'  # Логическое значение: true, false
 
     # КЛЮЧЕВЫЕ СЛОВА (зарезервированные слова языка)
-    FUN = 'FUN'  # Объявление функции: fun{}
+    FUN = 'FUN'  # Объявление функции: fun(value){}
     CONFIG = 'CONFIG' # Объявление конфига: config{}
     SCRIPT = 'SCRIPT' # Объявление начала скрипта: script{}
     CLASS = 'CLASS'  # Объявление класса: class{}
     ENUM = 'ENUM'  # Объявление перечисления: enum{}
-    IMPORT = 'IMPORT'  # Импорт модулей: import
+    IMPORT = 'IMPORT'  # Импорт модулей: import <module>
     VAR = 'VAR'  # Объявление изменяемой переменной var __name__ = value <- not const
     VAL = 'VAL' # Объявление неизменяемой переменной val __name__ = value <- const
-    IF = 'IF'  # Условный оператор: if
-    ELSE = 'ELSE'  # Условный оператор: else
+    IF = 'IF'  # Условный оператор: if(parameters){}
+    ELIF = 'ELIF' # Условный оператор: elif(parameters){}
+    ELSE = 'ELSE'  # Условный оператор: else{}
     WHILE = 'WHILE'  # Цикл while: while
     FOR = "FOR"  # Цикл for: for
-    PRINT = 'PRINT'  # Вывод на печать: print
+    FOREACH = "FOREACH" # Цикл foreach: foreach(variable in collection)
+    PRINT = 'PRINT'  # Вывод на печать: print(value)
     AXIOM = "AXIOME" # Еще не придумал
 
     # ОПЕРАТОРЫ (математические и логические операции)

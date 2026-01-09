@@ -41,6 +41,22 @@ class AxiomLexer:
         if self.current_char == '\n':
             self.advance()
 
+    def read_string(self):
+        self.advance() # пропускаем первую кавычку (пример -> "строка")
+        result = ''
+
+        #
+        while self.current_char is not None and self.current_char != '"': # цикл идет пока проверяемый символ != None и != '"'
+            result += self.current_char
+            self.advance() # двигаемся вперед
+
+        if self.current_char != '"': # проверяем, что строка закрыта
+            self.error("second quotation mark not found")
+
+        self.advance() # пропускаем закрывающую кавычку
+        return AxiomTokenType.STRING, result
+
+
     def read_number(self):
         result = ''
         has_dot = False
@@ -83,6 +99,10 @@ class AxiomLexer:
             if self.current_char.isspace():  # если символ который мы проверяем равен пробелу
                 self.skip_whitespace()  # то мы пропускаем пробелы
 
+            if self.current_char == '"': #
+                token_type, value = self.read_string()
+                return AxiomToken(token_type, value, self.line)
+
             if self.current_char == "$" or self.current_char == "#":  # если символ который мы проверяем равен символу комментария ( я сделал 2 символа комментариев)
                 self.skip_comment()  # то мы вызываем функцию для пропуска коммментов
                 continue  # continue начинает цикл заново с нового символа. Это гарантирует, что после пропуска пробелов/комментариев мы обработаем следующий значимый символ
@@ -96,10 +116,9 @@ class AxiomLexer:
 
 
 if __name__ == "__main__":
-    lexer = AxiomLexer("0.5 #...1")
-    tokens = []
-    for _ in range(5):
-        tokens.append(lexer.get_next_token())
-    print(tokens)
+    lexer = AxiomLexer('"hello"')
+    print(lexer.get_next_token())
 
-        # TODO: 09.01.2026 добавить обработку чисел с плавающей точкой СДЕЛАНО
+        # TODO: 09.01.2026 - добавить обработку чисел с плавающей точкой СДЕЛАНО
+        # TODO: 09.01.2026 - сделать базовую обработку строк СДЕЛАНО
+        # TODO: 09.01.2026 - сделать небольшое описание + часть доки + цели

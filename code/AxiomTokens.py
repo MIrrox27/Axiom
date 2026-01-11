@@ -28,7 +28,9 @@ class AxiomTokenType(Enum):
     FOR = "FOR"  # Цикл for: for
     FOREACH = "FOREACH" # Цикл foreach: foreach(variable in collection)
     PRINT = 'PRINT'  # Вывод на печать: print(value)
-    AXIOM = "AXIOME" # Еще не придумал
+    #AXIOM = "AXIOM" # Еще не придумал
+    RETURN = 'RETURN' # Возврат значения: return
+
 
     # ОПЕРАТОРЫ (математические и логические операции)
     PLUS = 'PLUS'  # Сложение: +
@@ -40,7 +42,8 @@ class AxiomTokenType(Enum):
     NOT_EQUALS = 'NOT_EQUALS'  # Неравенство: !=
     LESS = 'LESS'  # Меньше: <
     GREATER = 'GREATER'  # Больше: >
-    MOD = 'MOD'# %
+    MOD = 'MOD' # %
+    POWER = 'POWER' # степень числа: **
 
     # РАЗДЕЛИТЕЛИ (пунктуация и скобки)
     LPAREN = 'LPAREN'  # Левая круглая скобка: (

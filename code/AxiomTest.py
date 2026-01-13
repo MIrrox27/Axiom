@@ -12,11 +12,6 @@ var name = "Василий"
 var active = true
 var inactive = false
 
-config {
-    var n = 1
-    val a = 3 // негр
-}
-
 # Арифметические операции
 val sum = x + 10
 val power = 2 ** 3
@@ -35,11 +30,6 @@ while i < 3 {
     print "Итерация: " + i
     i = i + 1
 }
-
-"x / y",      # нормальное деление
-    "x // y",     # должна быть ошибка или пропуск комментария
-    "// comment", # комментарий
-    "x = 10 // 2"
 
 # Вызов функции (объявление)
 fun greet(person) {

@@ -37,7 +37,7 @@ class AxiomLexer:
 
 
     def error(self, message: str):
-        raise Exception(f'Error in {self.line}: {message}')
+        raise Exception(f'[Lexer Error] in {self.line}: {message}')
 
     def advance(self):  # функция, которая двигает вперед наш курсор
         if self.current_char == "\n":

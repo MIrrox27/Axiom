@@ -205,6 +205,14 @@ class AxiomLexer:
                 self.advance()
                 return AxiomToken(AxiomTokenType.RBRACE, line=self.line)
 
+            if self.current_char == '[':
+                self.advance()
+                return AxiomToken(AxiomTokenType.RBRACKET, line=self.line)
+
+            if self.current_char == ']':
+                self.advance()
+                return AxiomToken(AxiomTokenType.LBRACKET, line=self.line)
+
             if self.current_char == ';':
                 self.advance()
                 return AxiomToken(AxiomTokenType.SEMICOLON, line=self.line)

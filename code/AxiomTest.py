@@ -3,6 +3,8 @@
 
 from AxiomLexer import AxiomLexer
 from AxiomTokens import AxiomTokenType
+from AxiomASTNodes import *
+from AxiomParser import AxiomParser
 
 class Test:
     def __init__(self):
@@ -82,7 +84,7 @@ class Test:
         return tokens
 
 
-    def test_edge_cases(self):
+    def test_lexer_edge_cases(self):
         print("\n" + "=" * 60)
         print("ТЕСТИРОВАНИЕ ПОГРАНИЧНЫХ СЛУЧАЕВ")
         print("=" * 60)
@@ -108,12 +110,70 @@ class Test:
                     break
 
 
+    def test_AST(self):
+        # TODO: сделать оформление
 
+        print('\nAST TEST')
+        print('=' * 60)
+        number_literal = Literal(42)
+        string_literal = Literal("hello")
+        variable_x = Identifier("x")
+
+        print(number_literal)
+        print(variable_x)
+        print(string_literal)
+
+        print('=' * 60)
+
+        multiply = BinaryOp(
+            left=Literal(5),
+            operator="*",
+            right=Literal(3)
+        )
+
+
+        expression = BinaryOp(
+            left=Identifier("x"),
+            operator="+",
+            right=multiply
+        )
+
+        print("AST дерево:")
+        print(expression)
+        print("\nРазберем по частям:")
+        print(f"Весь узел: {expression}")
+        print(f"Левый операнд: {expression.left}")
+        print(f"Оператор: {expression.operator}")
+        print(f"Правый операнд: {expression.right}")
+        print(f"  → Левый операнд умножения: {expression.right.left}")
+        print(f"  → Правый операнд умножения: {expression.right.right}")
+
+        print('=' * 60)
+
+
+
+    def test_parser(self):
+        # TODO: сделать оформление
+        lexer = AxiomLexer("x + 5")
+        parser = AxiomParser(lexer)
+
+        print(f"Текущий токен: {parser.current_token}")
+        # Должно быть: Token(IDENTIFIER, 'x', line: 1)
+
+        # Проверяем идентификатор
+        parser.eat(AxiomTokenType.IDENTIFIER)
+        print(f"{parser.current_token}")
+        # Должно быть: Token(PLUS, line: 1)
+
+        parser.eat(AxiomTokenType.PLUS)
+        print(parser.current_token)
+        # должно быть Token(AxiomTokenType.NUMBER, 5, line: 1)
 
 
 # Запуск теста
 if __name__ == "__main__":
 
-    test1 = Test()
-    test1.test_lexer_complete()
-    test1.test_edge_cases()
+    test = Test()
+    test.test_lexer_complete()
+    test.test_lexer_edge_cases()
+    test.test_AST()

@@ -50,6 +50,8 @@ class AxiomTokenType(Enum):
     RPAREN = 'RPAREN'  # Правая круглая скобка: )
     LBRACE = 'LBRACE'  # Левая фигурная скобка: {
     RBRACE = 'RBRACE'  # Правая фигурная скобка: }
+    LBRACKET = 'LBRACKET' # Левая квадратная скобка: [
+    RBRACKET = 'RBRACKET' # Правая квадратная скобка: ]
     SEMICOLON = 'SEMICOLON'  # Точка с запятой: ;
     COMMA = 'COMMA'  # Запятая: ,
 

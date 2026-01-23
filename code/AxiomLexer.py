@@ -253,7 +253,7 @@ class AxiomLexer:
 
 
 if __name__ == "__main__":
-    test_code = "cg x = 2 ** 3; print x % 3;"
+    test_code = "cg x = 2 ** 3; print x % 3; [sdfsdfsdfs] {} ()"
     lexer = AxiomLexer(test_code)
     while True:
         token = lexer.get_next_token()

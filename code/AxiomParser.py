@@ -41,7 +41,7 @@ class AxiomParser:
     def parse_term(self):
         node = self.parse_factor()
          #
-        while self.current_token.type in (AxiomTokenType.MULTIPLY, AxiomTokenType.DIVIDE, AxiomTokenType.MOD):
+        while self.current_token.type in (AxiomTokenType.MULTIPLY, AxiomTokenType.DIVIDE, AxiomTokenType.MOD, AxiomTokenType.POWER):
             operator_token = self.current_token
             self.eat(operator_token.type)
 
@@ -75,30 +75,44 @@ class AxiomParser:
             self.eat(token.type)
             return Literal(token.value)
 
+
         elif token.type == AxiomTokenType.LPAREN:
-            self.error('временно не доступно')
-            #self.eat(AxiomTokenType.LPAREN) #
-            #node = self.parse_expression()  # Рекурсивно парсим выражение внутри
-            #self.eat(AxiomTokenType.RPAREN)  #
-            #return node
+            self.eat(AxiomTokenType.LPAREN) #
+            node = self.parse_expression()  # Рекурсивно парсим выражение внутри
+            self.eat(AxiomTokenType.RPAREN)  #
+            return node
 
         elif token.type == AxiomTokenType.LBRACE:
-            self.error('временно не доступно')
-            # self.eat(AxiomTokenType.LBRACE) #
-            # node = self.parse_expression()  # Рекурсивно парсим выражение внутри
-            # self.eat(AxiomTokenType.RBRACE)  #
-            # return node
+            self.eat(AxiomTokenType.LBRACE) #
+            node = self.parse_expression()  # Рекурсивно парсим выражение внутри
+            self.eat(AxiomTokenType.RBRACE)  #
+            return node
 
         elif token.type == AxiomTokenType.LBRACKET:
-            self.error('временно не доступно')
-            # self.eat(AxiomTokenType.LBRACKET) #
-            # node = self.parse_expression()  # Рекурсивно парсим выражение внутри
-            # self.eat(AxiomTokenType.RBRACKET)  #
-            # return node
+            self.eat(AxiomTokenType.LBRACKET)  #
+            node = self.parse_expression()  # Рекурсивно парсим выражение внутри
+            self.eat(AxiomTokenType.RBRACKET)  #
+            return node
 
         else:
             self.error(f"Received {token.type}")
 
+    def parse_expression(self):
+        node = self.parse_term()
+
+        # парсим операторы + и -
+        while self.current_token.type in (AxiomTokenType.PLUS, AxiomTokenType.MINUS):
+            operator_token = self.current_token
+            self.eat(operator_token.type) # обрабатываем оператор (сьедаем)
+
+            right = self.parse_term() # парсим праавую часть
+
+            node = BinaryOp(
+                left=node,
+                operator=operator_token.type,
+                right=right
+            )
+        return node
 
 
 
@@ -107,24 +121,22 @@ class AxiomParser:
 # TEST
 if __name__ == '__main__':
 
-    # Тест 1: Числа
-    lexer = AxiomLexer("42")
-    parser = AxiomParser(lexer)
-    result = parser.parse_primary()
-    print(f"Тест 1 (число 42): {result}")
-    print(f"  Тип узла: {type(result).__name__}")
-    print(f"  Значение: {result.value}")  # ← Используем .value для Literal
 
-    # Тест 2: Идентификатор
-    lexer = AxiomLexer("variable_name")
-    parser = AxiomParser(lexer)
-    result = parser.parse_primary()
-    print(f"\nТест 2 (идентификатор): {result}")
-    print(f"  Тип узла: {type(result).__name__}")
-    if isinstance(result, Identifier):  # ← Проверяем тип перед доступом к .name
-        print(f"  Имя переменной: {result.name}")
-    else:
-        print(f"  Узел не является идентификатором, это: {type(result).__name__}")
+
+
+    # Тестируем приоритет операторов
+    test_cases = [
+        "(2 + 3) * 4",  # → (2 + 3) * 4
+        "2 * (3 + 4)",  # → 2 * (3 + 4)
+        "((2 + 3) * 4)", # → ((2 + 3) * 4)
+        "1 ** 1"
+    ]
+
+    for code in test_cases:
+        lexer = AxiomLexer(code)
+        parser = AxiomParser(lexer)
+        result = parser.parse_expression()
+        print(f"{code:15s} → {result}")
 
 
   #TODO:  -

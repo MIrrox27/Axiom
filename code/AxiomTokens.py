@@ -30,6 +30,7 @@ class AxiomTokenType(Enum):
     PRINT = 'PRINT'  # Вывод на печать: print(value)
     #AXIOM = "AXIOM" # Еще не придумал
     RETURN = 'RETURN' # Возврат значения: return
+    IS = 'IS' # is
 
 
     # ОПЕРАТОРЫ (математические и логические операции)
@@ -44,6 +45,8 @@ class AxiomTokenType(Enum):
     GREATER = 'GREATER'  # Больше: >
     MOD = 'MOD' # %
     POWER = 'POWER' # степень числа: **
+    LESS_EQUAL = 'LESS_EQUAL' # <=
+    GREATER_EQUAL = 'GREATER_EQUAL' # >=
 
     # РАЗДЕЛИТЕЛИ (пунктуация и скобки)
     LPAREN = 'LPAREN'  # Левая круглая скобка: (

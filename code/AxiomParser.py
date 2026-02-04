@@ -15,7 +15,7 @@ class AxiomParser:
 
     def log(self, message):
         if self.debug:
-            print(f'[Parser DEBUG]: {message}')
+            print(f'[Parser DEBUG]: {message}, line: {lexer.line}, position: {lexer.position}, current char: {lexer.current_char}')
 
 
     def error(self, message):
@@ -30,14 +30,14 @@ class AxiomParser:
 
 
 
-    def parse_factor(self): # парсит выражения с высшим приорететом (допустим возведение в степень)
+    def parse_power(self): # парсит выражения с высшим приорететом (допустим возведение в степень)
 
         node = self.parse_primary()
 
         while self.current_token.type == AxiomTokenType.POWER:
             operator_token = self.current_token
             self.eat(AxiomTokenType.POWER)
-            right = self.parse_factor()
+            right = self.parse_power()
 
             node = BinaryOp(
                 left=node,
@@ -46,14 +46,14 @@ class AxiomParser:
             )
         return node
 
-    def parse_term(self):
-        node = self.parse_factor()
+    def parse_mul_div_mod(self):
+        node = self.parse_power()
          #
         while self.current_token.type in (AxiomTokenType.MULTIPLY, AxiomTokenType.DIVIDE, AxiomTokenType.MOD):
             operator_token = self.current_token
             self.eat(operator_token.type)
 
-            right = self.parse_factor()
+            right = self.parse_power()
 
             node = BinaryOp(
                 left=node,
@@ -68,67 +68,102 @@ class AxiomParser:
         token = self.current_token
 
         if token.type in (AxiomTokenType.NUMBER, AxiomTokenType.FLOAT): #
+            self.log(f'received: [{token.type}]')
             self.eat(token.type)
             return Literal(token.value)
 
         elif token.type == AxiomTokenType.STRING:
+            self.log(f'received: [{token.type}]')
             self.eat(token.type)
             return Literal(token.value)
 
         elif token.type == AxiomTokenType.BOOL:
+            self.log(f'received: [{token.type}]', )
             self.eat(token.type)
             return  Literal(token.value)
 
         elif token.type == AxiomTokenType.IDENTIFIER:
+            self.log(f'received: [{token.type}]')
             self.eat(token.type)
             return Identifier(token.value)
 
 
         elif token.type == AxiomTokenType.LPAREN:
+            self.log(f'received: [{token.type}]')
             self.eat(AxiomTokenType.LPAREN) #
             node = self.parse_expression()  # Рекурсивно парсим выражение внутри
-            self.eat(AxiomTokenType.RPAREN)  #
+            self.eat(AxiomTokenType.RPAREN) #
             return node
 
         elif token.type == AxiomTokenType.LBRACE:
+            self.log(f'received: [{token.type}]')
             self.eat(AxiomTokenType.LBRACE) #
             node = self.parse_expression()  # Рекурсивно парсим выражение внутри
-            self.eat(AxiomTokenType.RBRACE)  #
+            self.eat(AxiomTokenType.RBRACE) #
             return node
 
         elif token.type == AxiomTokenType.LBRACKET:
+            self.log(f'received: [{token.type}]')
             self.eat(AxiomTokenType.LBRACKET)  #
-            node = self.parse_expression()  # Рекурсивно парсим выражение внутри
+            node = self.parse_expression()     # Рекурсивно парсим выражение внутри
             self.eat(AxiomTokenType.RBRACKET)  #
             return node
 
         else:
             self.error(f"Received {token.type}")
 
-    def parse_expression(self):
-        self.log(f"Начало parse_expression(), токен: {self.current_token}")
+    def parse_add_sub(self): # парсит сложение и вычитание
+        self.log(f"Start parse_add_sub(), token: {self.current_token}")
 
-        node = self.parse_term()
-        self.log(f"После первого parse_term(), узел: {node}, токен: {self.current_token}")
+        node = self.parse_mul_div_mod()
+        self.log(f"Parse 1st parse_term(), node: {node}, token: {self.current_token}")
 
         while self.current_token.type in (AxiomTokenType.PLUS, AxiomTokenType.MINUS):
             operator_token = self.current_token
-            self.log(f"Нашли оператор {operator_token.type}, парсим дальше")
+            self.log(f"Operator {operator_token.type}, parse further")
 
             self.eat(operator_token.type)
-            right = self.parse_term()
+            right = self.parse_mul_div_mod()
 
-            self.log(f"Создаем BinaryOp: {node} {operator_token.type} {right}")
+            self.log(f"Create BinaryOp: {node} {operator_token.type} {right}")
             node = BinaryOp(
                 left=node,
                 operator=operator_token.type,
                 right=right
             )
 
-        self.log(f"Конец parse_expression(), возвращаем: {node}")
+        self.log(f"End parse_expression(), return: {node}")
+        return node
+
+    def parse_comparison(self):
+        node = self.parse_add_sub()
+
+        comparison_operators = (
+            #AxiomTokenType.GREATER_EQUAL,
+            #AxiomTokenType.LESS_EQUAL,
+
+            AxiomTokenType.EQUALS,
+            AxiomTokenType.NOT_EQUALS,
+            AxiomTokenType.LESS,
+            AxiomTokenType.GREATER
+        )
+        while self.current_token.type in comparison_operators:
+            operator_token = self.current_token
+            self.eat(operator_token.type)
+
+            right = self.parse_add_sub()
+
+            node = BinaryOp(
+                left=node,
+                operator=operator_token.type,
+                right=right
+
+            )
         return node
 
 
+    def parse_expression(self): # главный модуль, сделан для начала распределения парсинга
+        return self.parse_comparison()
 
 
 
@@ -136,15 +171,20 @@ class AxiomParser:
 if __name__ == '__main__':
 
     tests = [
-        '1 ** 1'
+        '1 ** 1',
+        '123 + 1 ** 2',
+        '2 + 1 + (1*1)',
+        '{1 + 1}',
+        '[1 + 1] ** 12',
+        '(1 + 1)'
     ]
 
-    print("Тестирование parse_expression():")
+    print("Тестирование")
     print("=" * 50)
 
     for code in tests:
         lexer = AxiomLexer(code)
-        parser = AxiomParser(lexer, debug=True)
+        parser = AxiomParser(lexer)
 
 
         result = parser.parse_expression()

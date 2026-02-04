@@ -1,5 +1,6 @@
 # author https://github.com/MIrrox27/Axiom
 # AxiomLexer.py
+from typing import Self
 
 from AxiomTokens import AxiomTokenType, AxiomToken
 
@@ -32,6 +33,7 @@ class AxiomLexer:
             'enum': AxiomTokenType.ENUM,
             'script': AxiomTokenType.SCRIPT,
             'config': AxiomTokenType.CONFIG,
+            'is': AxiomTokenType.IS,
             'return': AxiomTokenType.RETURN
         }
 
@@ -126,7 +128,7 @@ class AxiomLexer:
         else:
             return AxiomTokenType.NUMBER, int(result) # если точки нет, возвращаем int
 
-    def get_next_token(self, debug: bool= False):
+    def get_next_token(self, debug: bool=False):
         while self.current_char is not None:  # пока символ который мы проверяем не равен None
             if debug == True:
                 print(f"DEBUG: current_char={repr(self.current_char)}, pos={self.position}")
@@ -184,11 +186,22 @@ class AxiomLexer:
 
             if self.current_char == '<':
                 self.advance()
-                return AxiomToken(AxiomTokenType.LESS, line=self.line)
+                if self.current_char == '=':
+                    self.advance()
+                    return AxiomToken(AxiomTokenType.LESS_EQUAL, line=self.line)
+
+                else:
+                    return AxiomToken(AxiomTokenType.LESS, line=self.line)
 
             if self.current_char == '>':
                 self.advance()
-                return AxiomToken(AxiomTokenType.GREATER, line=self.line)
+                if self.current_char == '=':
+                    self.advance()
+                    return AxiomToken(AxiomTokenType.GREATER_EQUAL, line=self.line)
+
+                else:
+                    return AxiomToken(AxiomTokenType.GREATER, line=self.line)
+
 
             if self.current_char == '(':
                 self.advance()
@@ -208,11 +221,11 @@ class AxiomLexer:
 
             if self.current_char == '[':
                 self.advance()
-                return AxiomToken(AxiomTokenType.RBRACKET, line=self.line)
+                return AxiomToken(AxiomTokenType.LBRACKET, line=self.line)
 
             if self.current_char == ']':
                 self.advance()
-                return AxiomToken(AxiomTokenType.LBRACKET, line=self.line)
+                return AxiomToken(AxiomTokenType.RBRACKET, line=self.line)
 
             if self.current_char == ';':
                 self.advance()

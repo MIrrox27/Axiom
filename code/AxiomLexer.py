@@ -152,6 +152,7 @@ class AxiomLexer:
                 self.advance()
 
                 if self.current_char == '*':
+                    self.advance()
                     return AxiomToken(AxiomTokenType.POWER, line=self.line)
                 else:
                     return AxiomToken(AxiomTokenType.MULTIPLY, line=self.line)
@@ -253,7 +254,7 @@ class AxiomLexer:
 
 
 if __name__ == "__main__":
-    test_code = "cg x = 2 ** 3; print x % 3; [sdfsdfsdfs] {} ()"
+    test_code = "**"
     lexer = AxiomLexer(test_code)
     while True:
         token = lexer.get_next_token()

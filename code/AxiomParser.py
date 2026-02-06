@@ -135,17 +135,17 @@ class AxiomParser:
         self.log(f"End parse_expression(), return: {node}")
         return node
 
-    def parse_comparison(self):
+    def parse_comparison(self): # парсинг выражений равенства
         node = self.parse_add_sub()
 
         comparison_operators = (
-            #AxiomTokenType.GREATER_EQUAL,
-            #AxiomTokenType.LESS_EQUAL,
+            AxiomTokenType.GREATER_EQUAL, # >=
+            #AxiomTokenType.LESS_EQUAL, # <=
 
-            AxiomTokenType.EQUALS,
-            AxiomTokenType.NOT_EQUALS,
-            AxiomTokenType.LESS,
-            AxiomTokenType.GREATER
+            AxiomTokenType.EQUALS, # ==
+            AxiomTokenType.NOT_EQUALS, # !=
+            AxiomTokenType.LESS, # <
+            AxiomTokenType.GREATER # >
         )
         while self.current_token.type in comparison_operators:
             operator_token = self.current_token
@@ -171,12 +171,12 @@ class AxiomParser:
 if __name__ == '__main__':
 
     tests = [
-        '1 ** 1',
-        '123 + 1 ** 2',
-        '2 + 1 + (1*1)',
-        '{1 + 1}',
-        '[1 + 1] ** 12',
-        '(1 + 1)'
+        '1 ** 1 != 1 + 1',
+        'negr == 1 + 1',
+        ' 1 < 1',
+        ' 1 != 1',
+        ' 1 > 1'
+        #'(1 + 1) = (1 ** 1 != 1 + 1) != cos (123 + 1 ** 2 >= 1+ 1) + 2 + 1 + (1*1) <= 1 +1 ** [nig ** 2 ** 2] + {333+1==1}'
     ]
 
     print("Тестирование")

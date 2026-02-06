@@ -171,6 +171,7 @@ class AxiomLexer:
                 self.advance()
 
                 if self.current_char == '=':
+                    self.advance()
                     return AxiomToken(AxiomTokenType.EQUALS, line=self.line)
 
                 else:
@@ -180,6 +181,7 @@ class AxiomLexer:
                 self.advance()
 
                 if self.current_char == '=':
+                    self.advance()
                     return AxiomToken(AxiomTokenType.NOT_EQUALS)
                 else:
                     self.error("WHERE IS '=' AFTER '!' ???")

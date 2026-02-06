@@ -1,6 +1,5 @@
 # author https://github.com/MIrrox27/Axiom
 # AxiomLexer.py
-from typing import Self
 
 from AxiomTokens import AxiomTokenType, AxiomToken
 

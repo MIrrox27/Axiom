@@ -48,6 +48,46 @@ class BinaryOp(Expression):
 
 
 
+class Statement(ASTNode):
+    # базовый класс для всех инструкций
+    pass
+
+class ExpressionStmt(Statement): # инструкция выражения
+    def __init__(self, expression):
+        self.expression = expression
+
+
+class VarDeclaration(Statement): # объявление переменных и констант
+    # тк структура этого класса выглядит так: var/val name = value, имена переменных соответствующие
+    def __init__(self, keyword, name, value):
+        self.keyword = keyword # слово которым я объявляю переменную (var/val)
+        self.name = name # имя переменной
+        self.value = value # значение переменной
+
+
+class Block(Statement): # блок кода
+    def __init__(self, statements):
+        self.statements = statements
+
+class EmtpyStmt(Statement): # пустая инструкция
+    pass
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # TEST
 if __name__ == "__main__":
     number_literal = Literal(42)

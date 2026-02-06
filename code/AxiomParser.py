@@ -139,7 +139,7 @@ class AxiomParser:
         node = self.parse_add_sub()
 
         comparison_operators = (
-            AxiomTokenType.GREATER_EQUAL, # >=
+            #AxiomTokenType.GREATER_EQUAL, # >=
             #AxiomTokenType.LESS_EQUAL, # <=
 
             AxiomTokenType.EQUALS, # ==
@@ -171,7 +171,7 @@ class AxiomParser:
 if __name__ == '__main__':
 
     tests = [
-        '1 ** 1 != 1 + 1',
+        'if __name__ == 1: ',
         'negr == 1 + 1',
         ' 1 < 1',
         ' 1 != 1',

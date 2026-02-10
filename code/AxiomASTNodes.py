@@ -49,7 +49,7 @@ class BinaryOp(Expression):
 
 
 class Statement(ASTNode):
-    # базовый класс для всех инструкций
+    # базовый класс для всех инструкций, которые не возвращают значения
     pass
 
 class ExpressionStmt(Statement): # инструкция выражения

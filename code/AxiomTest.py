@@ -169,11 +169,53 @@ class Test:
         print(parser.current_token)
         # должно быть Token(AxiomTokenType.NUMBER, 5, line: 1)
 
+        print('><><' * 60)
+        test_cases = [
+            # Простые объявления
+            ("var x;", "VarDeclaration с именем x без значения"),
+            ("var x = 5;", "VarDeclaration с именем x и значением 5"),
+            ("val y = 10;", "VarDeclaration с val, именем y и значением 10"),
+
+            # Блоки кода
+            ("{}", "Пустой блок"),
+            ("{ var x = 5; }", "Блок с одной инструкцией"),
+            ("{ var x = 5; var y = 10; }", "Блок с двумя инструкциями"),
+
+            # Инструкции-выражения
+            ("x + 5;", "ExpressionStmt с выражением x + 5"),
+            ("42;", "ExpressionStmt с литералом 42"),
+
+            # Пустая инструкция
+            (";", "EmptyStmt"),
+        ]
+
+        print("Тестирование парсинга инструкций:")
+        print("=" * 60)
+
+        for code, description in test_cases:
+            print(f"\nТест: {description}")
+            print(f"Код: {code}")
+
+            lexer = AxiomLexer(code)
+            parser = AxiomParser(lexer)
+
+            try:
+                result = parser.parse_statement()
+                print(f"Результат: {result}")
+
+                # Проверяем, что весь код разобран
+                if parser.current_token.type != AxiomTokenType.EOF:
+                    print(f"ВНИМАНИЕ: Не весь код разобран. Остался: {parser.current_token}")
+
+            except Exception as e:
+                print(f"ОШИБКА: {e}")
+
 
 # Запуск теста
 if __name__ == "__main__":
 
     test = Test()
-    test.test_lexer_complete()
-    test.test_lexer_edge_cases()
-    test.test_AST()
+    #test.test_lexer_complete()
+    #test.test_lexer_edge_cases()
+    #test.test_AST()
+    test.test_parser()

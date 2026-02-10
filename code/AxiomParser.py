@@ -161,6 +161,77 @@ class AxiomParser:
             )
         return node
 
+    def parse_block(self):
+        self.eat(AxiomTokenType.LBRACE)
+
+        statements = []
+
+        while self.current_token.type != AxiomTokenType.RBRACE:
+            if self.current_token == AxiomTokenType.EOF:
+                self.error("Block not closed, pending '}'")
+
+                stmt = self.parse_statement()
+                statements.append(stmt)
+
+        self.eat(AxiomTokenType.RBRACE)
+        return Block(statements=statements)
+
+
+
+    def parse_var_declaration(self): # парсит объявление переменной
+        keyword_token = self.current_token
+        self.eat(keyword_token.type)
+
+
+
+        if self.current_token.type != AxiomTokenType.IDENTIFIER:    # получаем имя переменной
+            self.error(f'After {keyword_token.type} pending main value')
+
+        name = self.current_token.value
+        self.eat(AxiomTokenType.IDENTIFIER)
+
+        value = None
+        if self.current_token.type == AxiomTokenType.ASSIGN: # проверяем наличие присваивания значения, если есть то парсим его
+            self.eat(AxiomTokenType.ASSIGN)
+            value = self.parse_expression()
+
+
+        if keyword_token.type == AxiomTokenType.VAL and value is not None:
+            self.error(f"Const '{name}' must have a main value")
+
+        if self.current_token.type == AxiomTokenType.SEMICOLON:
+            self.eat(AxiomTokenType.SEMICOLON)
+
+        return  VarDeclaration(keyword_token.type, name=name, value=value)
+
+
+
+
+
+    def parse_statement(self):
+        token = self.current_token
+
+        if token.type == AxiomTokenType.SEMICOLON:
+            self.eat(AxiomTokenType.SEMICOLON)
+            return EmtpyStmt
+
+        elif token.type == AxiomTokenType.LBRACE:
+            return self.parse_block() # функция, которая будет парсить блоки кода, у нас они находятся в {}
+
+        elif token.type in (AxiomTokenType.VAL, AxiomTokenType.VAR):
+            return self.parse_var_declaration()
+
+        # тут будут другие проверки действий
+
+        else:
+            expr = self.parse_expression()
+
+            if self.current_token.type == AxiomTokenType.SEMICOLON:
+                self.eat(AxiomTokenType.SEMICOLON)
+            return ExpressionStmt(expr)
+
+
+
 
     def parse_expression(self): # главный модуль, сделан для начала распределения парсинга
         return self.parse_comparison()

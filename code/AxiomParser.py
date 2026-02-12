@@ -170,8 +170,8 @@ class AxiomParser:
             if self.current_token == AxiomTokenType.EOF:
                 self.error("Block not closed, pending '}'")
 
-                stmt = self.parse_statement()
-                statements.append(stmt)
+            stmt = self.parse_statement()
+            statements.append(stmt)
 
         self.eat(AxiomTokenType.RBRACE)
         return Block(statements=statements)
@@ -196,7 +196,7 @@ class AxiomParser:
             value = self.parse_expression()
 
 
-        if keyword_token.type == AxiomTokenType.VAL and value is not None:
+        if keyword_token.type == AxiomTokenType.VAL and value is None:
             self.error(f"Const '{name}' must have a main value")
 
         if self.current_token.type == AxiomTokenType.SEMICOLON:
@@ -242,10 +242,10 @@ class AxiomParser:
 if __name__ == '__main__':
 
     tests = [
-        'if __name__ == 1: ',
-        'negr == 1 + 1',
+
+        'negr = 1 + 1',
         ' 1 < 1',
-        ' 1 != 1',
+        ' val a = 1',
         ' 1 > 1'
         #'(1 + 1) = (1 ** 1 != 1 + 1) != cos (123 + 1 ** 2 >= 1+ 1) + 2 + 1 + (1*1) <= 1 +1 ** [nig ** 2 ** 2] + {333+1==1}'
     ]
@@ -258,7 +258,7 @@ if __name__ == '__main__':
         parser = AxiomParser(lexer)
 
 
-        result = parser.parse_expression()
+        result = parser.parse_statement()
 
         if parser.current_token.type != AxiomTokenType.EOF:
             print(f"Внимание: не весь код разобран для '{code}'")

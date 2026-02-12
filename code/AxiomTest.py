@@ -154,6 +154,9 @@ class Test:
 
     def test_parser(self):
         # TODO: сделать оформление
+            # СЧЕТЧИКИ:
+        instructions_err = 0
+
         lexer = AxiomLexer("x + 5")
         parser = AxiomParser(lexer)
 
@@ -182,8 +185,9 @@ class Test:
             ("{ var x = 5; var y = 10; }", "Блок с двумя инструкциями"),
 
             # Инструкции-выражения
-            ("x + 5;", "ExpressionStmt с выражением x + 5"),
-            ("42;", "ExpressionStmt с литералом 42"),
+            ("x + 5; # комментарий", "ExpressionStmt с выражением x + 5"),
+            ("42; // тоже комментарий", "ExpressionStmt с литералом 42"),
+
 
             # Пустая инструкция
             (";", "EmptyStmt"),
@@ -206,16 +210,18 @@ class Test:
                 # Проверяем, что весь код разобран
                 if parser.current_token.type != AxiomTokenType.EOF:
                     print(f"ВНИМАНИЕ: Не весь код разобран. Остался: {parser.current_token}")
+                    instructions_err += 1
 
             except Exception as e:
                 print(f"ОШИБКА: {e}")
+        print(f"\n ---Errors: {instructions_err}")
 
 
 # Запуск теста
 if __name__ == "__main__":
 
     test = Test()
-    #test.test_lexer_complete()
-    #test.test_lexer_edge_cases()
-    #test.test_AST()
+    test.test_lexer_complete()
+    test.test_lexer_edge_cases()
+    test.test_AST()
     test.test_parser()

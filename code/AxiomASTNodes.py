@@ -72,8 +72,20 @@ class Block(Statement): # блок кода
 class EmtpyStmt(Statement): # пустая инструкция
     pass
 
+class IFStmt(Statement):  # узел AST для оператора IF
+    def __init__(self, condition, than_branch, elif_branches=None, else_branch=None):
+        self.condition = condition # условие (выражение)
+        self.than_branch = than_branch # сам блок if
+        self.elif_branches = elif_branches if elif_branches else [] # список блоков elif (может быть равен 0)
+        self.else_branch = else_branch # блок else (может отсутствовать)
 
+class ElifClause:  # вспомогательный класс для ветки elif
+    def __init__(self, condition, block):
+        self.condition = condition # условие
+        self.block = block # блок
 
+    def __repr__(self): # строковое представление объекта
+        return f"ElifClause({self.condition}, {self.block})"
 
 
 

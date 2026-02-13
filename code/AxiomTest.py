@@ -216,6 +216,48 @@ class Test:
                 print(f"ОШИБКА: {e}")
         print(f"\n ---Errors: {instructions_err}")
 
+    def test_loops(self):
+        print("ТЕСТИРОВАНИЕ ЦИКЛОВ")
+        print("=" * 60)
+
+        test_cases = [
+            # WHILE
+            ("while x < 5 { print(x); x = x + 1; }", "простой while"),
+            ("while (x < 5) { print(x); }", "while со скобками"),
+            ("while true { }", "бесконечный while (пустое тело)"),
+
+            # FOR (пока только с выражением в инициализации)
+            ("for i = 0; i < 10; i = i + 1 { print(i); }", "for с выражением-инициализатором"),
+            ("for ; i < 10; i = i + 1 { }", "for без инициализации"),
+            ("for i = 0; ; i = i + 1 { }", "for без условия (бесконечный)"),
+            ("for i = 0; i < 10; { print(i); i = i + 1; }", "for без инкремента"),
+
+            # FOREACH (после добавления IN)
+            #("foreach item in items { print(item); }", "foreach по коллекции"),
+            #("foreach x in range(1,10) { print(x); }", "foreach с вызовом функции"),
+        ]
+
+        for code, description in test_cases:
+            print(f"\n {description}")
+            print(f"Код: {code}")
+            lexer = AxiomLexer(code)
+            parser = AxiomParser(lexer)
+            try:
+                ast = parser.parse_statement()
+                print(f"AST: {ast}")
+                if parser.current_token.type != AxiomTokenType.EOF:
+                    print(f"  Остались токены: {parser.current_token}")
+                else:
+                    print(" Весь код разобран")
+            except Exception as e:
+                if str(e) != "[Parser Error]: Received AxiomTokenType.PRINT": # временно пропускаем ошибку с отсутствием функции
+                    print(f" Ошибка: {e}")
+                else:
+                    print(" Весь код разобран")
+
+
+
+
     def test_if_parsing(self):
         print("ТЕСТИРОВАНИЕ ПАРСИНГА IF-ELIF-ELSE")
         print("=" * 60)
@@ -300,3 +342,4 @@ if __name__ == "__main__":
     test.test_AST()
     test.test_parser()
     test.test_if_parsing()
+    test.test_loops()

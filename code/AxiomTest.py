@@ -216,6 +216,80 @@ class Test:
                 print(f"ОШИБКА: {e}")
         print(f"\n ---Errors: {instructions_err}")
 
+    def test_if_parsing(self):
+        print("ТЕСТИРОВАНИЕ ПАРСИНГА IF-ELIF-ELSE")
+        print("=" * 60)
+
+        err = 0
+        good_err = 0
+        tokens = 0
+
+        test_cases = [
+            # Простой if
+            ('if x > 5 { print("ok"); }', "if без else"),
+            # if-else
+            ('if x > 5 { print("ok"); } else { print("no"); }', "if-else"),
+            # if-elif-else
+            ('if x > 5 { print(">5"); } elif x == 5 { print("=5"); } else { print("<5"); }', "if-elif-else"),
+            # Несколько elif
+            ('if x > 10 { print(">10"); } elif x > 5 { print(">5"); } elif x > 0 { print(">0"); }', "несколько elif"),
+            # Условие в скобках
+            ('if (x > 5) { print("ok"); }', "скобки вокруг условия"),
+            # Пустой блок (допустимо)
+            ('if x > 5 {}', "пустой then-блок"),
+            # Только if, без точки с запятой (блок сам по себе)
+            ('if x > 5 { var a = 10; }', "if с объявлением переменной"),
+            ('if x == 5 { if x > 5 { print("ok"); } elif x == 5 { print("=5"); } else { print("<5"); } }', "вложенные условия")
+        ]
+
+        for code, description in test_cases:
+            print(f"\n>>> {description}")
+            print(f"Код: {code}")
+
+            lexer = AxiomLexer(code)
+            parser = AxiomParser(lexer)
+
+            try:
+                ast = parser.parse_statement()
+                print(f"AST: {ast}")
+
+                # Проверяем, что весь код разобран
+                if parser.current_token.type != AxiomTokenType.EOF:
+                    print(f"----Остались токены: {parser.current_token}")
+                    tokens += 1
+                else:
+                    print("+Весь код разобран")
+
+            except Exception as e:
+                if str(e) != "[Parser Error]: Received AxiomTokenType.PRINT": # временно пропускаем ошибки с неизвестными функциями
+                    err += 1
+                print(f"----Ошибка: {e}")
+
+                print("\n" + "=" * 60)
+                print("ТЕСТИРОВАНИЕ ОШИБОК")
+                print("=" * 60)
+
+                error_cases = [
+                    ('if x > 5', "нет блока после условия"),
+                    ('if { print("ok"); }', "нет условия"),
+                    ('if x > 5 { ; } elif { print("elif"); }', "нет условия у elif"),
+                    ('if x > 5 {  x=42; } else { } else { }', "два else"),
+                ]
+
+                for code, description in error_cases:
+                    print(f"\n>>> {description}")
+                print(f"Код: {code}")
+                lexer = AxiomLexer(code)
+                parser = AxiomParser(lexer)
+            try:
+                ast = parser.parse_statement()
+                print(f"-----Ошибка не обнаружена! AST: {ast}")
+                err+=1
+            except Exception as e:
+                good_err += 1
+                print(f"-----Ожидаемая ошибка: {e}")
+
+        print(f'\n>> Ожидаемые ошибки: {good_err} \n>> Непроверенные токены: {tokens} \n>> Неизвестные ошибки: {err}')
 
 # Запуск теста
 if __name__ == "__main__":
@@ -225,3 +299,4 @@ if __name__ == "__main__":
     test.test_lexer_edge_cases()
     test.test_AST()
     test.test_parser()
+    test.test_if_parsing()

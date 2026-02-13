@@ -87,6 +87,29 @@ class ElifClause:  # вспомогательный класс для ветки
     def __repr__(self): # строковое представление объекта
         return f"ElifClause({self.condition}, {self.block})"
 
+class WhileStmt(Statement): # обычный цикл while
+    def __init__(self, condition, body):
+        self.condition = condition # условие при котором цикл выполняется
+        self.body = body # тело цикла
+
+
+
+class ForStmt(Statement): # обычный цикл for (как в С++)
+    def __init__(self, initializer, condition, increment, body):
+        self.initializer = initializer # то что выполняется 1 раз при инициализации (допустим создание переменной)
+        self.condition = condition # условие при котором выполняется цикл
+        self.increment = increment  # то что выполняется после цикла (допустим увеличение переменной на 1)
+        self.body = body # тело цикла
+
+
+class ForeachStmt(Statement): # цикл для перебора
+    def __init__(self, variable, iterable, body):
+        self.variable = variable # переменная, которая превращается в каждый элемент
+        self.iterable = iterable # список, массив и т.п
+        self.body = body # тело цикла
+
+
+
 
 
 

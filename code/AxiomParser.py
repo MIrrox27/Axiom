@@ -205,6 +205,50 @@ class AxiomParser:
         return  VarDeclaration(keyword_token.type, name=name, value=value)
 
 
+    def parse_if_statement(self): # парсинг if/elif/else
+        self.eat(AxiomTokenType.IF) # съедаем if
+
+        if self.current_token.type == AxiomTokenType.LPAREN: # если есть скобки парсим выражение внутри них
+            self.eat(AxiomTokenType.LPAREN)
+            condition = self.parse_expression()
+            self.eat(AxiomTokenType.RPAREN)
+        else:
+            condition = self.parse_expression()
+
+        than_branch = self.parse_block()
+
+        elif_branches = []
+        while self.current_token.type == AxiomTokenType.ELIF:
+            self.eat(AxiomTokenType.ELIF)
+
+            if self.current_token.type == AxiomTokenType.LPAREN:
+                self.eat(AxiomTokenType.LPAREN)
+                elif_condition = self.parse_expression()
+                self.eat(AxiomTokenType.RPAREN)
+            else:
+                elif_condition = self.parse_expression()
+
+            elif_block = self.parse_block()
+            elif_branches.append(elif_condition, elif_block)
+
+
+        else_branch = None
+        if self.current_token.type == AxiomTokenType.ELSE:
+            self.eat(AxiomTokenType.ELSE)
+            else_branch = self.parse_block()
+
+        return IFStmt(
+            condition=condition,
+            than_branch=than_branch,
+            elif_branches=elif_branches,
+            else_branch=else_branch
+        )
+
+
+
+
+
+
 
 
 
@@ -221,7 +265,13 @@ class AxiomParser:
         elif token.type in (AxiomTokenType.VAL, AxiomTokenType.VAR):
             return self.parse_var_declaration()
 
+
+        elif token.type == AxiomTokenType.IF:
+            return self.parse_if_statement()
+
         # тут будут другие проверки действий
+
+
 
         else:
             expr = self.parse_expression()

@@ -33,6 +33,7 @@ class AxiomLexer:
             'script': AxiomTokenType.SCRIPT,
             'config': AxiomTokenType.CONFIG,
             'is': AxiomTokenType.IS,
+            'in': AxiomTokenType.IN,
             'return': AxiomTokenType.RETURN
         }
 

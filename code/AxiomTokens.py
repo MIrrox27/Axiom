@@ -31,6 +31,7 @@ class AxiomTokenType(Enum):
     #AXIOM = "AXIOM" # Еще не придумал
     RETURN = 'RETURN' # Возврат значения: return
     IS = 'IS' # is
+    IN = 'IN' # in
 
 
     # ОПЕРАТОРЫ (математические и логические операции)

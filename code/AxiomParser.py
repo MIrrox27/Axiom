@@ -13,6 +13,7 @@ class AxiomParser:
         self.current_token = self.lexer.get_next_token()
         self.debug = debug
 
+
     def log(self, message):
         if self.debug:
             print(f'[Parser DEBUG]: {message}, line: {lexer.line}, position: {lexer.position}, current char: {lexer.current_char}')
@@ -29,9 +30,7 @@ class AxiomParser:
             # token_type - токен, который нам нужен
 
 
-
     def parse_power(self): # парсит выражения с высшим приорететом (допустим возведение в степень)
-
         node = self.parse_primary()
 
         while self.current_token.type == AxiomTokenType.POWER:
@@ -45,6 +44,7 @@ class AxiomParser:
                 right=right
             )
         return node
+
 
     def parse_mul_div_mod(self):
         node = self.parse_power()
@@ -61,7 +61,6 @@ class AxiomParser:
                 right=right
             )
         return node
-
 
 
     def parse_primary(self):  # Парсит первичные выражения. Возвращает узел AST
@@ -112,6 +111,7 @@ class AxiomParser:
         else:
             self.error(f"Received {token.type}")
 
+
     def parse_add_sub(self): # парсит сложение и вычитание
         self.log(f"Start parse_add_sub(), token: {self.current_token}")
 
@@ -135,6 +135,7 @@ class AxiomParser:
         self.log(f"End parse_expression(), return: {node}")
         return node
 
+
     def parse_comparison(self): # парсинг выражений равенства
         node = self.parse_add_sub()
 
@@ -157,9 +158,9 @@ class AxiomParser:
                 left=node,
                 operator=operator_token.type,
                 right=right
-
             )
         return node
+
 
     def parse_block(self):
         self.eat(AxiomTokenType.LBRACE)
@@ -177,12 +178,9 @@ class AxiomParser:
         return Block(statements=statements)
 
 
-
     def parse_var_declaration(self): # парсит объявление переменной
         keyword_token = self.current_token
         self.eat(keyword_token.type)
-
-
 
         if self.current_token.type != AxiomTokenType.IDENTIFIER:    # получаем имя переменной
             self.error(f'After {keyword_token.type} pending main value')
@@ -194,7 +192,6 @@ class AxiomParser:
         if self.current_token.type == AxiomTokenType.ASSIGN: # проверяем наличие присваивания значения, если есть то парсим его
             self.eat(AxiomTokenType.ASSIGN)
             value = self.parse_expression()
-
 
         if keyword_token.type == AxiomTokenType.VAL and value is None:
             self.error(f"Const '{name}' must have a main value")
@@ -231,7 +228,6 @@ class AxiomParser:
             elif_block = self.parse_block()
             elif_branches.append(elif_condition, elif_block)
 
-
         else_branch = None
         if self.current_token.type == AxiomTokenType.ELSE:
             self.eat(AxiomTokenType.ELSE)
@@ -245,11 +241,53 @@ class AxiomParser:
         )
 
 
+    def parse_while_statement(self):
+        self.eat(AxiomTokenType.WHILE)
+
+        if self.current_token.type == AxiomTokenType.LPAREN:
+            self.eat(AxiomTokenType.LPAREN)
+            condition = self.parse_expression()
+            self.eat(AxiomTokenType.RPAREN)
+        else:
+            condition = self.parse_expression()
+
+        body = self.parse_block()
+        return WhileStmt(condition=condition, body=body)
 
 
+    def parse_for_statement(self):
+        self.eat(AxiomTokenType.FOR)
+
+            # Парсинг инициализатора
+        if self.current_token.type == AxiomTokenType.SEMICOLON:
+            initializer = None
+        elif self.current_token.type in (AxiomTokenType.VAL, AxiomTokenType.VAR):
+            initializer = self.parse_var_declaration()
+            self.error(f"Временно не доступно объявление var/val в цикле for")
+        else:
+            initializer = self.parse_expression()
+
+        self.eat(AxiomTokenType.SEMICOLON) # после инициализации обязательно должно быть ";"
+
+            # Парсинг условия при котором цикл выполняется
+        if self.current_token.type == AxiomTokenType.SEMICOLON:
+            condition = None
+        else:
+            condition = self.parse_expression()
+
+        self.eat(AxiomTokenType.SEMICOLON)
+
+            # Парсинг инкремента
+        if self.current_token.type == AxiomTokenType.LBRACE:
+            increment = None
+        else:
+            increment = self.parse_expression()
+
+        body = self.parse_block()
+        return ForStmt(initializer=initializer, condition=condition, body=body)
 
 
-
+    #def parse_foreach_statement(self):
 
 
     def parse_statement(self):
@@ -265,14 +303,19 @@ class AxiomParser:
         elif token.type in (AxiomTokenType.VAL, AxiomTokenType.VAR):
             return self.parse_var_declaration()
 
-
         elif token.type == AxiomTokenType.IF:
             return self.parse_if_statement()
 
+        elif token.type == AxiomTokenType.WHILE:
+            return self.parse_while_statement()
+
+        elif token.type == AxiomTokenType.FOR:
+            return self.parse_for_statement()
+
+        elif token.type == AxiomTokenType.FOREACH:
+            return self.parse_foreach_statement()
+
         # тут будут другие проверки действий
-
-
-
         else:
             expr = self.parse_expression()
 

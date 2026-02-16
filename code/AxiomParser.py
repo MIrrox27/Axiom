@@ -1,5 +1,6 @@
 # author https://github.com/MIrrox27/Axiom
 # AxiomParser.py
+from typing import Self
 
 from AxiomASTNodes import *
 from AxiomLexer import AxiomLexer
@@ -16,7 +17,7 @@ class AxiomParser:
 
     def log(self, message):
         if self.debug:
-            print(f'[Parser DEBUG]: {message}, line: {lexer.line}, position: {lexer.position}, current char: {lexer.current_char}')
+            print(f'[Parser DEBUG]: {message}, line: {self.lexer.line}, position: {self.lexer.position}, current char: {self.lexer.current_char}')
 
 
     def error(self, message):
@@ -26,11 +27,11 @@ class AxiomParser:
         if self.current_token.type == token_type:
             self.current_token = self.lexer.get_next_token()
         else:
-            self.error(f"Pending {token_type}, received {self.current_token.type}") # self.current_token.type - тип токена который мы получили,
+            self.error(f"[eat] Pending {token_type}, received {self.current_token.type}, line: {self.lexer.line}, position: {self.lexer.position}, current char: {self.lexer.current_char}") # self.current_token.type - тип токена который мы получили,
             # token_type - токен, который нам нужен
 
 
-    def parse_power(self): # парсит выражения с высшим приорететом (допустим возведение в степень)
+    def parse_power(self): # парсит выражения с высшим приоритетом (допустим возведение в степень)
         node = self.parse_primary()
 
         while self.current_token.type == AxiomTokenType.POWER:
@@ -109,7 +110,7 @@ class AxiomParser:
             return node
 
         else:
-            self.error(f"Received {token.type}")
+            self.error(f"[parse_primari] Received {token.type}")
 
 
     def parse_add_sub(self): # парсит сложение и вычитание
@@ -257,34 +258,39 @@ class AxiomParser:
 
     def parse_for_statement(self):
         self.eat(AxiomTokenType.FOR)
+        if self.current_token.type == AxiomTokenType.LPAREN:
+            self.eat(AxiomTokenType.LPAREN) # тк у нас все условия цикла находятся в скобках
+                # До первого ";"
+            if self.current_token.type == AxiomTokenType.SEMICOLON:
+                initializer = None
+            elif self.current_token.type in (AxiomTokenType.VAL, AxiomTokenType.VAR):
+                initializer = self.parse_var_declaration()
+                self.error("В for нельзя объявлять переменные с var/val (пока)")
+            else:
+                initializer = self.parse_expression()
 
-            # Парсинг инициализатора
-        if self.current_token.type == AxiomTokenType.SEMICOLON:
-            initializer = None
-        elif self.current_token.type in (AxiomTokenType.VAL, AxiomTokenType.VAR):
-            initializer = self.parse_var_declaration()
-            self.error(f"Временно не доступно объявление var/val в цикле for")
+            self.eat(AxiomTokenType.SEMICOLON)
+
+                # После первого ";", до второго ";"
+            if self.current_token.type == AxiomTokenType.SEMICOLON:
+                condition = None
+            else:
+                condition = self.parse_expression()
+
+                #
+            if self.current_token.type == AxiomTokenType.RPAREN:
+                increment = None
+            else:
+                increment = self.parse_expression()
+
+            self.eat(AxiomTokenType.RPAREN)
+
+            body  = self.parse_block()
+            return ForStmt(initializer=initializer, condition=condition, increment=increment)
+
         else:
-            initializer = self.parse_expression()
+            return self.error("")
 
-        self.eat(AxiomTokenType.SEMICOLON) # после инициализации обязательно должно быть ";"
-
-            # Парсинг условия при котором цикл выполняется
-        if self.current_token.type == AxiomTokenType.SEMICOLON:
-            condition = None
-        else:
-            condition = self.parse_expression()
-
-        self.eat(AxiomTokenType.SEMICOLON)
-
-            # Парсинг инкремента
-        if self.current_token.type == AxiomTokenType.LBRACE:
-            increment = None
-        else:
-            increment = self.parse_expression()
-
-        body = self.parse_block()
-        return ForStmt(initializer=initializer, condition=condition, body=body)
 
 
     #def parse_foreach_statement(self):

@@ -293,7 +293,26 @@ class AxiomParser:
 
 
 
-    #def parse_foreach_statement(self):
+    def parse_foreach_statement(self):
+        # TODO: Исправить все баги с этом циклом
+
+        self.eat(AxiomTokenType.FOREACH)
+        if self.current_token.type != AxiomTokenType.FOREACH:
+            self.error("[parse_foreach_statement] After the loop a variable is expected")
+
+        var_name = self.current_token.value
+        self.eat(AxiomTokenType.IDENTIFIER)
+
+        if self.current_token.type != AxiomTokenType.IN:
+            self.error("[parse_foreach_statement] After the variable expected 'in'")
+        self.eat(AxiomTokenType.IN)
+
+        iterable = self.parse_expression()
+
+        body = self.parse_block()
+
+        return ForeachStmt(Identifier(var_name), iterable=iterable, body=body)
+
 
 
     def parse_statement(self):

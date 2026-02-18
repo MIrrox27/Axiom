@@ -67,11 +67,35 @@ class AxiomLexer:
         if self.current_char == '\n':
             self.advance()
 
-    def read_string(self):
+    def read_string_single_quotes(self):
+        self.advance()  # пропускаем первую кавычку (пример -> "строка")
+        result = ''
+
+        while self.current_char is not None and (
+                self.current_char != "'"):  # цикл идет пока проверяемый символ != None и != "'"
+            result += self.current_char
+            self.advance()  # двигаемся вперед
+
+        if self.current_char != "'":  # проверяем, что строка закрыта
+            self.error("second quotation mark not found")
+
+        self.advance()  # пропускаем закрывающую кавычку
+        return AxiomTokenType.STRING, result
+
+    def read_identifier(self):
+        result = ''
+        while self.current_char is not None and (
+                self.current_char.isalpha() or self.current_char == '_'):  # первый символ - буква или подчеркивание
+            result += self.current_char
+            self.advance()
+        return result
+
+
+    def read_string_double_quotes(self):
         self.advance() # пропускаем первую кавычку (пример -> "строка")
         result = ''
 
-        while self.current_char is not None and self.current_char != '"': # цикл идет пока проверяемый символ != None и != '"'
+        while self.current_char is not None and (self.current_char != '"'): # цикл идет пока проверяемый символ != None и != '"'
             result += self.current_char
             self.advance() # двигаемся вперед
 
@@ -132,6 +156,8 @@ class AxiomLexer:
         while self.current_char is not None:  # пока символ который мы проверяем не равен None
             if debug == True:
                 print(f"DEBUG: current_char={repr(self.current_char)}, pos={self.position}")
+
+
             if self.current_char.isspace():  # если символ который мы проверяем равен пробелу
                 self.skip_whitespace()  # то мы пропускаем пробелы
 
@@ -238,7 +264,11 @@ class AxiomLexer:
                 return AxiomToken(AxiomTokenType.COMMA, line=self.line)
 
             if self.current_char == '"': #
-                token_type, value = self.read_string()
+                token_type, value = self.read_string_double_quotes()
+                return AxiomToken(token_type, value, self.line)
+
+            if self.current_char == "'": #
+                token_type, value = self.read_string_single_quotes()
                 return AxiomToken(token_type, value, self.line)
 
             if self.current_char == "#":  # если символ который мы проверяем равен символу комментария ( я сделал 2 символа комментариев)

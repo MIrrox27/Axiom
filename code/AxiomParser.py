@@ -297,7 +297,15 @@ class AxiomParser:
         # TODO: Исправить все баги с этом циклом
 
         self.eat(AxiomTokenType.FOREACH)
-        if self.current_token.type != AxiomTokenType.FOREACH:
+
+        if self.current_token.type == AxiomTokenType.VAR:
+            self.eat(AxiomTokenType.VAR)
+
+        elif self.current_token.type == AxiomTokenType.VAL:
+            self.error("[parse_foreach_statement] you can't use ")
+
+
+        if self.current_token.type != AxiomTokenType.IDENTIFIER:
             self.error("[parse_foreach_statement] After the loop a variable is expected")
 
         var_name = self.current_token.value

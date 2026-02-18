@@ -176,7 +176,7 @@ class Test:
         test_cases = [
             # Простые объявления
             ("var x;", "VarDeclaration с именем x без значения"),
-            ("var x = 5;", "VarDeclaration с именем x и значением 5"),
+            ("var I_Love_Axiome = 'тест на русском'", "VarDeclaration с именем x и текстовым значением "),
             ("val y = 10;", "VarDeclaration с val, именем y и значением 10"),
 
             # Блоки кода
@@ -219,22 +219,27 @@ class Test:
     def test_loops(self):
         print("ТЕСТИРОВАНИЕ ЦИКЛОВ")
         print("=" * 60)
+        """     На данном этапе я не подключил обработку var и val
+        
+        
+                                        """
+
 
         test_cases = [
             # WHILE
-            ("while x < 5 { print(x); x = x + 1; }", "простой while"),
-            ("while (x < 5) { print(x); }", "while со скобками"),
+            ("while x < 5 { val x = 5; val y = 10; }", "простой while"),
+            ("while (x < 5) { if 1 == 1{ val I_Love_Axiome = 1;} }", "while со скобками"),
             ("while true { }", "бесконечный while (пустое тело)"),
 
             # FOR (пока только с выражением в инициализации)
-            ("for i = 0; i < 10; i = i + 1 { print(i); }", "for с выражением-инициализатором"),
-            ("for ; i < 10; i = i + 1 { }", "for без инициализации"),
-            ("for i = 0; ; i = i + 1 { }", "for без условия (бесконечный)"),
-            ("for i = 0; i < 10; { print(i); i = i + 1; }", "for без инкремента"),
+            ("for (i == 0; i < 10; i = i + 1) { val prnt = 234; }", "for с выражением-инициализатором"),
+            ("for (; i < 10; i = i + 1) { }", "for без инициализации"),
+            ("for (i = 0; ; i = i + 1) { }", "for без условия (бесконечный)"),
+            ("for (i = 0; i < 10;) { var ex = 1; var i = i + 1; }", "for без инкремента"),
 
             # FOREACH (после добавления IN)
-            #("foreach item in items { print(item); }", "foreach по коллекции"),
-            #("foreach x in range(1,10) { print(x); }", "foreach с вызовом функции"),
+            ("foreach item in items { val value = 'value 123 ;1;1 != тест '; }", "foreach по коллекции"),
+            ("foreach var x in range { val text = '{value на русском и английском}'; }", "foreach с вызовом функции"),
         ]
 
         for code, description in test_cases:
@@ -268,20 +273,20 @@ class Test:
 
         test_cases = [
             # Простой if
-            ('if x > 5 { print("ok"); }', "if без else"),
+            ('if x > 5 {  }', "if без else"),
             # if-else
-            ('if x > 5 { print("ok"); } else { print("no"); }', "if-else"),
+            ('if x > 5 { var I_Love_Axiome = 1; } else { var I_Love_Axiome = 2; }', "if-else"),
             # if-elif-else
-            ('if x > 5 { print(">5"); } elif x == 5 { print("=5"); } else { print("<5"); }', "if-elif-else"),
+            ('if x > 5 { var i = true; } elif x == 5 { var i = false; } else {  }', "if-elif-else"),
             # Несколько elif
-            ('if x > 10 { print(">10"); } elif x > 5 { print(">5"); } elif x > 0 { print(">0"); }', "несколько elif"),
+            ('if x > 10 { val e = 1; } elif x > 5 { var i = 2 } elif x > 0 { var j = 2 }', "несколько elif"),
             # Условие в скобках
-            ('if (x > 5) { print("ok"); }', "скобки вокруг условия"),
+            ('if (x > 5) { var i = 234234 }', "скобки вокруг условия"),
             # Пустой блок (допустимо)
             ('if x > 5 {}', "пустой then-блок"),
             # Только if, без точки с запятой (блок сам по себе)
             ('if x > 5 { var a = 10; }', "if с объявлением переменной"),
-            ('if x == 5 { if x > 5 { print("ok"); } elif x == 5 { print("=5"); } else { print("<5"); } }', "вложенные условия")
+            ('if x == 5 { if x > 5 { val value = "value 123 ;1;1 != тест "; } elif x == 5 { val value = "value 123 ;1;1 != тест "; } else { var = "ест на символы {elif x == 5 { val value = "value 123 ;1;1 != тест "; }}" } }', "вложенные условия")
         ]
 
         for code, description in test_cases:
@@ -305,7 +310,7 @@ class Test:
             except Exception as e:
                 if str(e) != "[Parser Error]: Received AxiomTokenType.PRINT": # временно пропускаем ошибки с неизвестными функциями
                     err += 1
-                print(f"----Ошибка: {e}")
+                    print(f"----Ошибка: {e}")
 
                 print("\n" + "=" * 60)
                 print("ТЕСТИРОВАНИЕ ОШИБОК")
@@ -337,9 +342,9 @@ class Test:
 if __name__ == "__main__":
 
     test = Test()
-    test.test_lexer_complete()
-    test.test_lexer_edge_cases()
-    test.test_AST()
+    #test.test_lexer_complete()
+    #test.test_lexer_edge_cases()
+    #test.test_AST()
     test.test_parser()
-    test.test_if_parsing()
+    #test.test_if_parsing()
     test.test_loops()

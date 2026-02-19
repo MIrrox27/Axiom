@@ -28,7 +28,7 @@ class AxiomTokenType(Enum):
     FOR = "FOR"  # Цикл for: for
     FOREACH = "FOREACH" # Цикл foreach: foreach(variable in collection)
     PRINT = 'PRINT'  # Вывод на печать: print(value)
-    BLOCK = 'BLOCK' # Ключевое слово для обозначения исполнения блока кода на другом языке
+    BLOCK = 'BLOCK' # Ключевое слово для обозначения исполнения блока кода на другом языке block __lang__{code}
     #AXIOM = "AXIOM" # Еще не придумал
     RETURN = 'RETURN' # Возврат значения: return
     IS = 'IS' # is
@@ -58,6 +58,7 @@ class AxiomTokenType(Enum):
     LBRACKET = 'LBRACKET' # Левая квадратная скобка: [
     RBRACKET = 'RBRACKET' # Правая квадратная скобка: ]
     SEMICOLON = 'SEMICOLON'  # Точка с запятой: ;
+    COLON = 'COLON' # Двоеточие: :
     COMMA = 'COMMA'  # Запятая: ,
 
     # СПЕЦИАЛЬНЫЕ ТОКЕНЫ

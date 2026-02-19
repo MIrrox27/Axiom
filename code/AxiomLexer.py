@@ -172,6 +172,14 @@ class AxiomLexer:
                 self.advance()
                 return AxiomToken(AxiomTokenType.PLUS, line=self.line)
 
+            if self.current_char == ';':
+                self.advance()
+                return AxiomToken(AxiomTokenType.SEMICOLON, line=self.line)
+
+            if self.current_char == ':':
+                self.advance()
+                return AxiomToken(AxiomTokenType.COLON, line=self.line)
+
             if self.current_char == '-':
                 self.advance()
                 return AxiomToken(AxiomTokenType.MINUS, line=self.line)

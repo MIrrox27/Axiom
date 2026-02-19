@@ -28,6 +28,7 @@ class AxiomTokenType(Enum):
     FOR = "FOR"  # Цикл for: for
     FOREACH = "FOREACH" # Цикл foreach: foreach(variable in collection)
     PRINT = 'PRINT'  # Вывод на печать: print(value)
+    BLOCK = 'BLOCK' # Ключевое слово для обозначения исполнения блока кода на другом языке
     #AXIOM = "AXIOM" # Еще не придумал
     RETURN = 'RETURN' # Возврат значения: return
     IS = 'IS' # is

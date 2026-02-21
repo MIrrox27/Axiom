@@ -24,7 +24,7 @@ class Expression(ASTNode):
     pass
 
 
-class Programm(ASTNode):
+class Program(ASTNode):
     # Вся программа - список инструкций
     def __init__(self, statements):
         self.statements = statements

@@ -84,8 +84,10 @@ class AxiomLexer:
 
     def read_identifier(self):
         result = ''
+        if self.current_char.isdigit():
+            self.error("[read_identifier] the name cannot start with a number")
         while self.current_char is not None and (
-                self.current_char.isalpha() or self.current_char == '_'):  # первый символ - буква или подчеркивание
+                self.current_char.isalpha() or self.current_char == '_' or self.current_char.isdigit()):  # первый символ - буква или подчеркивание
             result += self.current_char
             self.advance()
         return result
@@ -105,12 +107,6 @@ class AxiomLexer:
         self.advance() # пропускаем закрывающую кавычку
         return AxiomTokenType.STRING, result
 
-    def read_identifier(self):
-        result = ''
-        while self.current_char is not None and (self.current_char.isalpha() or self.current_char == '_'): # первый символ - буква или подчеркивание
-            result += self.current_char
-            self.advance()
-        return result
 
 
 
@@ -315,9 +311,3 @@ if __name__ == "__main__":
         if token.type == AxiomTokenType.EOF:
             break
 
-        # TODO: 09.01.2026 - добавить обработку чисел с плавающей точкой СДЕЛАНО
-        # TODO: 09.01.2026 - сделать базовую обработку строк СДЕЛАНО
-        # TODO: 09.01.2026 - сделать небольшое описание + часть доки + цели
-        # TODO: 11.01.2026 - сделать обработку ключевых слов СДЕЛАНО
-        # TODO: 11.01.2026 - сделать обработку операторов (+, - и т.д) СДЕЛАНО
-        # TODO: 11.01.2026 - доделать лексер и провести финальные тесты СДЕЛАНО

@@ -17,17 +17,17 @@ class AxiomParser:
 
     def log(self, message):
         if self.debug:
-            print(f'[Parser DEBUG]: {message}, line: {self.lexer.line}, position: {self.lexer.position}, current char: {self.lexer.current_char}')
+            print(f'[Parser DEBUG]: {message}, line: {self.lexer.line}, position: {self.lexer.position}, current char: "{self.lexer.current_char}"')
 
 
     def error(self, message):
-        raise Exception(f'[Parser Error]: {message}')
+        raise Exception(f'[Parser Error]: {message}, line: {self.lexer.line}, position: {self.lexer.position}, current char: "{self.lexer.current_char}"')
 
     def eat(self, token_type): # Проверяет, что текущий токен имеет ожидаемый тип
         if self.current_token.type == token_type:
             self.current_token = self.lexer.get_next_token()
         else:
-            self.error(f"[eat] Pending {token_type}, received {self.current_token.type}, line: {self.lexer.line}, position: {self.lexer.position}, current char: {self.lexer.current_char}") # self.current_token.type - тип токена который мы получили,
+            self.error(f"[eat] Pending {token_type}, received {self.current_token.type}") # self.current_token.type - тип токена который мы получили,
             # token_type - токен, который нам нужен
 
 
@@ -141,8 +141,8 @@ class AxiomParser:
         node = self.parse_add_sub()
 
         comparison_operators = (
-            #AxiomTokenType.GREATER_EQUAL, # >=
-            #AxiomTokenType.LESS_EQUAL, # <=
+            AxiomTokenType.GREATER_EQUAL, # >=
+            AxiomTokenType.LESS_EQUAL, # <=
 
             AxiomTokenType.EQUALS, # ==
             AxiomTokenType.NOT_EQUALS, # !=
@@ -179,7 +179,7 @@ class AxiomParser:
         return Block(statements=statements)
 
 
-    def parse_var_declaration(self): # парсит объявление переменной
+    def parse_var_declaration(self, loop:bool = False): # парсит объявление переменной
         keyword_token = self.current_token
         self.eat(keyword_token.type)
 
@@ -197,7 +197,7 @@ class AxiomParser:
         if keyword_token.type == AxiomTokenType.VAL and value is None:
             self.error(f"Const '{name}' must have a main value")
 
-        if self.current_token.type == AxiomTokenType.SEMICOLON:
+        if self.current_token.type == AxiomTokenType.SEMICOLON and not loop:
             self.eat(AxiomTokenType.SEMICOLON)
 
         return  VarDeclaration(keyword_token.type, name=name, value=value)
@@ -260,22 +260,24 @@ class AxiomParser:
         self.eat(AxiomTokenType.FOR)
         if self.current_token.type == AxiomTokenType.LPAREN:
             self.eat(AxiomTokenType.LPAREN) # тк у нас все условия цикла находятся в скобках
-                # До первого ";"
+
+            # До первого ";"
             if self.current_token.type == AxiomTokenType.SEMICOLON:
                 initializer = None
-            elif self.current_token.type in (AxiomTokenType.VAL, AxiomTokenType.VAR):
-                initializer = self.parse_var_declaration()
-                self.error("В for нельзя объявлять переменные с var/val (пока)")
+            elif self.current_token.type == AxiomTokenType.VAR:
+                initializer = self.parse_var_declaration(loop=True)
+                #self.error("В for нельзя объявлять переменные с var/val (пока)")
             else:
                 initializer = self.parse_expression()
-
             self.eat(AxiomTokenType.SEMICOLON)
+
 
                 # После первого ";", до второго ";"
             if self.current_token.type == AxiomTokenType.SEMICOLON:
                 condition = None
             else:
                 condition = self.parse_expression()
+
 
                 #
             if self.current_token.type == AxiomTokenType.RPAREN:
@@ -286,7 +288,7 @@ class AxiomParser:
             self.eat(AxiomTokenType.RPAREN)
 
             body  = self.parse_block()
-            return ForStmt(initializer=initializer, condition=condition, increment=increment)
+            return ForStmt(initializer=initializer, condition=condition, increment=increment, body=body)
 
         else:
             return self.error("")

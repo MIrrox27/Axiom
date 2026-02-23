@@ -235,7 +235,7 @@ class Test:
             ("for (var i = 0; i < 10; i = i + 1) { val prnt = 234; }", "for с выражением-инициализатором"),
             ("for (; i < 10; i = i + 1) { }", "for без инициализации"),
             ("for (var i = 0; ; i = i + 1) { }", "for без условия (бесконечный)"),
-            ("for (var i = 0; i < 10;) { var ex = 1; var i = i + 1; }", "for без инкремента"),
+            ("for (; ;) { var ex = 1; var i = i + 1; }", "for без инкремента"),
 
             # FOREACH (после добавления IN)
             ("foreach item in items { val value = 'value 123 ;1;1 != тест '; }", "foreach по коллекции"),

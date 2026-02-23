@@ -216,7 +216,7 @@ class Test:
                 print(f"ОШИБКА: {e}")
         print(f"\n ---Errors: {instructions_err}")
 
-    def test_loops(self):
+    def test_parser_loops(self):
         print("ТЕСТИРОВАНИЕ ЦИКЛОВ")
         print("=" * 60)
         """     На данном этапе я не подключил обработку var и val
@@ -338,13 +338,106 @@ class Test:
 
         print(f'\n>> Ожидаемые ошибки: {good_err} \n>> Непроверенные токены: {tokens} \n>> Неизвестные ошибки: {err}')
 
+
+    def test_parser_full(self):
+        # ------------------ ПОЗИТИВНЫЕ ТЕСТЫ (должны парситься без ошибок) ------------------
+        positive_tests = [
+            # Простые инструкции
+            "var x;",
+            "val y = 42;",
+            "var z = x + 5;",
+            "x = 10;",
+            "x = y + 2 * 3;",
+
+            # Блоки
+            "{ var a = 1; val b = 2; }",
+
+            # Арифметика и сравнения
+            "a + b * c ** d;",
+            "x == y;",
+            "x != y;",
+            "x < y;",
+            "x > y;",
+            "x <= y;",
+            "x >= y;",
+            "2 + 3 == 5;",
+
+            # Условные операторы
+            "if x > 5 { var msg = 'big'; }",
+            "if x > 5 { msg = 'big'; } else { msg = 'small'; }",
+            "if x > 10 { msg = 'very big'; } elif x > 5 { msg = 'big'; } else { msg = 'small'; }",
+            "if (x > 5) { }",
+
+            # Циклы
+            "while x < 10 { x = x + 1; }",
+            "while (x < 10) { x = x + 1; }",
+            "for (var i = 0; i < 10; i = i + 1) { prnt = i ** 1 + 2; }",
+            "for (i = 0; i < 10; i = i + 1) { }",
+            "for (; i < 10; i = i + 1) { }",
+            "for (var i = 0; ; i = i + 1) { }",
+            "for (var i = 0; i < 10; ) { i = i + 1; }",
+            "foreach item in items { prnt = item; }",
+            "foreach var item in items { item = prnt + 1; }",
+
+            # Сложные комбинации
+            "{ var x = 0; while x < 5 { if x % 2 == 0 { x = x + 2; } else { x = x + 1; } } }",
+        ]
+
+        print("Запуск позитивных тестов...")
+        for i, code in enumerate(positive_tests, 1):
+            lexer = AxiomLexer(code)
+            parser = AxiomParser(lexer)
+            try:
+                ast = parser.parse_statement()
+                # Проверяем, что после парсинга достигнут конец файла
+                assert parser.current_token.type == AxiomTokenType.EOF, \
+                    f"Тест {i}: после парсинга остались токены: {parser.current_token}"
+                # Если мы дошли сюда без исключений, тест пройден
+            except Exception as e:
+                raise AssertionError(f"Позитивный тест {i} не прошел:\nКод: {code}\nОшибка: {e}")
+
+        print(f"[v] Все позитивные тесты пройдены ({len(positive_tests)})")
+
+
+        negative_tests = [
+            # Ожидаемая ошибка: синтаксическая
+            ("var x = ;", "переменная без выражения"),
+            ("x = ;", "присваивание без правой части"),
+            ("if x > { }", "условие без выражения"),
+            ("while { }", "while без условия"),
+            ("for (i = 0; i < 10; )", "for без тела"),
+            ("foreach item in { }", "foreach без выражения коллекции"),
+            ("{ var x = 5;", "незакрытый блок"),
+            ("val x;", "константа без значения"),
+            ("1 + ;", "незавершённое выражение"),
+        ]
+
+        print("Запуск негативных тестов...")
+        for i, (code, desc) in enumerate(negative_tests, 1):
+            lexer = AxiomLexer(code)
+            parser = AxiomParser(lexer)
+            try:
+                ast = parser.parse_statement()
+                # Если исключения не возникло — ошибка теста
+                raise AssertionError(
+                    f"Негативный тест {i} должен был провалиться, но не провалился:\nКод: {code} ({desc})")
+            except Exception:
+                # Исключение ожидаемо — тест пройден
+                pass
+
+        print(f"[v] Все негативные тесты пройдены ({len(negative_tests)})")
+
+        print("\n[V] Все тесты парсера успешно пройдены!")
+
+
 # Запуск теста
 if __name__ == "__main__":
 
     test = Test()
-    #test.test_lexer_complete()
-    #test.test_lexer_edge_cases()
-    #test.test_AST()
+    test.test_lexer_complete()
+    test.test_lexer_edge_cases()
+    test.test_AST()
     test.test_parser()
-    #test.test_if_parsing()
-    test.test_loops()
+    test.test_if_parsing()
+    test.test_parser_loops()
+    test.test_parser_full()

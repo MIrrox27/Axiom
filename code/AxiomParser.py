@@ -13,6 +13,7 @@ class AxiomParser:
         self.lexer = lexer
         self.current_token = self.lexer.get_next_token()
         self.debug = debug
+        self.loop_for = False
 
 
     def log(self, message):
@@ -21,6 +22,7 @@ class AxiomParser:
 
 
     def error(self, message):
+        self.loop_for = False
         raise Exception(f'[Parser Error]: {message}, line: {self.lexer.line}, position: {self.lexer.position}, current char: "{self.lexer.current_char}"')
 
     def eat(self, token_type): # Проверяет, что текущий токен имеет ожидаемый тип
@@ -203,6 +205,26 @@ class AxiomParser:
         return  VarDeclaration(keyword_token.type, name=name, value=value)
 
 
+    def parse_assignment(self):
+        node = self.parse_comparison()
+
+        if self.current_token.type == AxiomTokenType.ASSIGN:
+            if not isinstance(node, Identifier): # Потом добавим обработку присваивания массивам, спискам словарям и тп.
+                self.error("[parse_assignment] Left side of assignment must be a variable")
+
+            operator_token = self.current_token
+            self.eat(AxiomTokenType.ASSIGN)
+
+            right = self.parse_assignment()
+            node = BinaryOp(
+                left=node,
+                operator=operator_token,
+                right=right
+
+            )
+        return node
+
+
     def parse_if_statement(self): # парсинг if/elif/else
         self.eat(AxiomTokenType.IF) # съедаем if
 
@@ -259,6 +281,8 @@ class AxiomParser:
     def parse_for_statement(self):
         self.eat(AxiomTokenType.FOR)
         if self.current_token.type == AxiomTokenType.LPAREN:
+            self.loop_for = True
+
             self.eat(AxiomTokenType.LPAREN) # тк у нас все условия цикла находятся в скобках
 
             # До первого ";"
@@ -266,17 +290,18 @@ class AxiomParser:
                 initializer = None
             elif self.current_token.type == AxiomTokenType.VAR:
                 initializer = self.parse_var_declaration(loop=True)
-                #self.error("В for нельзя объявлять переменные с var/val (пока)")
+            elif self.current_token.type == AxiomTokenType.VAL:
+                return self.error("[parse_for_statement] you can't use constants in loop")
             else:
                 initializer = self.parse_expression()
             self.eat(AxiomTokenType.SEMICOLON)
-
 
                 # После первого ";", до второго ";"
             if self.current_token.type == AxiomTokenType.SEMICOLON:
                 condition = None
             else:
                 condition = self.parse_expression()
+            self.eat(AxiomTokenType.SEMICOLON)
 
 
                 #
@@ -284,14 +309,15 @@ class AxiomParser:
                 increment = None
             else:
                 increment = self.parse_expression()
-
             self.eat(AxiomTokenType.RPAREN)
 
+
             body  = self.parse_block()
+            self.loop_for = False
             return ForStmt(initializer=initializer, condition=condition, increment=increment, body=body)
 
         else:
-            return self.error("")
+            return self.error("[parse_for_statement] Where is '(' after 'for'?")
 
 
 
@@ -362,7 +388,7 @@ class AxiomParser:
 
 
     def parse_expression(self): # главный модуль, сделан для начала распределения парсинга
-        return self.parse_comparison()
+        return self.parse_assignment()
 
 
 

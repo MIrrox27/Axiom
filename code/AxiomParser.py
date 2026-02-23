@@ -249,7 +249,7 @@ class AxiomParser:
                 elif_condition = self.parse_expression()
 
             elif_block = self.parse_block()
-            elif_branches.append(elif_condition, elif_block)
+            elif_branches.append(ElifClause(elif_condition, elif_block))
 
         else_branch = None
         if self.current_token.type == AxiomTokenType.ELSE:

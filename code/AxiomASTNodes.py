@@ -197,6 +197,18 @@ class WhileStmt(Statement): # обычный цикл while
         self.condition = condition # условие при котором цикл выполняется
         self.body = body # тело цикла
 
+class DoStmt(Statement):
+    """
+                Цикл Do (как do while в других языках, например Java) объявление:
+        do (условие) {
+            блок инструкций
+        }
+
+            Цикл первый раз выполняется всегда, потом только если условие возвращает true
+    """
+    def __init__(self, body, condition):
+        self.body = body
+        self.condition = condition
 
 class ForStmt(Statement): # обычный цикл for
     def __init__(self, initializer, condition, increment, body):

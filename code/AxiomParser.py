@@ -69,7 +69,7 @@ class AxiomParser:
     def parse_primary(self):  # Парсит первичные выражения. Возвращает узел AST
         token = self.current_token
 
-        if token.type in (AxiomTokenType.NUMBER, AxiomTokenType.FLOAT): #
+        if token.type in (AxiomTokenType.INTEGER, AxiomTokenType.FLOAT): #
             self.log(f'received: [{token.type}]')
             self.eat(token.type)
             return Literal(token.value)

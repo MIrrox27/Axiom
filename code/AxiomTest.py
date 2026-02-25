@@ -170,7 +170,7 @@ class Test:
 
         parser.eat(AxiomTokenType.PLUS)
         print(parser.current_token)
-        # должно быть Token(AxiomTokenType.NUMBER, 5, line: 1)
+        # должно быть Token(AxiomTokenType.INTEGER, 5, line: 1)
 
         print('><><' * 60)
         test_cases = [

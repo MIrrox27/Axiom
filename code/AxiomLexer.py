@@ -146,7 +146,7 @@ class AxiomLexer:
         if has_dot:
             return AxiomTokenType.FLOAT, float(result) # если точка есть, возвращаем float
         else:
-            return AxiomTokenType.NUMBER, int(result) # если точки нет, возвращаем int
+            return AxiomTokenType.INTEGER, int(result) # если точки нет, возвращаем int
 
     def get_next_token(self, debug: bool=False):
         while self.current_char is not None:  # пока символ который мы проверяем не равен None

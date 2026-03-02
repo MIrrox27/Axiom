@@ -272,10 +272,25 @@ class AxiomParser:
             condition = self.parse_expression()
             self.eat(AxiomTokenType.RPAREN)
         else:
-            condition = self.parse_expression()
+            self.error(f'[parse_while_statement] where is "(" ?')
 
         body = self.parse_block()
         return WhileStmt(condition=condition, body=body)
+
+
+    def parse_do_statement(self):
+        self.eat(AxiomTokenType.DO)
+
+        if self.current_token.type == AxiomTokenType.LPAREN:
+            self.eat(AxiomTokenType.LPAREN)
+            condition = self.parse_assignment()
+            self.eat(AxiomTokenType.RPAREN)
+        else:
+            self.error(f'[parse_while_statement] where is "(" ?')
+
+        body = self.parse_block()
+        return DoStmt(condition=condition, body=body)
+
 
 
     def parse_for_statement(self):
@@ -322,8 +337,6 @@ class AxiomParser:
 
 
     def parse_foreach_statement(self):
-        # TODO: Исправить все баги с этом циклом
-
         self.eat(AxiomTokenType.FOREACH)
 
         if self.current_token.type == AxiomTokenType.VAR:
@@ -376,6 +389,9 @@ class AxiomParser:
         elif token.type == AxiomTokenType.FOREACH:
             return self.parse_foreach_statement()
 
+        elif token.type == AxiomTokenType.DO:
+            return self.parse_do_statement()
+
         # тут будут другие проверки действий
         else:
             expr = self.parse_expression()
@@ -397,8 +413,8 @@ if __name__ == '__main__':
 
     tests = [
 
-        'neg = 1 + 1',
-        ' 1 < 1',
+        'do (x < 1){var x = 1}',
+        'while (x < 1){var x = 1}',
         ' val a = 1',
         ' 1 > 1'
 

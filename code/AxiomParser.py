@@ -31,7 +31,7 @@ class AxiomParser:
             self.log(f'[eat] received: [{token_type}]')
             self.current_token = self.lexer.get_next_token()
         else:
-            self.error(f"Pending {token_type}, received {self.current_token.type}") # self.current_token.type - тип токена который мы получили,
+            self.error(f"Pending {token_type}, received {self.current_token.type}", 'eat') # self.current_token.type - тип токена который мы получили,
             # token_type - токен, который нам нужен
 
 
@@ -177,7 +177,15 @@ class AxiomParser:
         return node
 
     def parse_logical_and(self):
-        pass
+        node = self.parse_comparison()
+        while self.current_token.type == AxiomTokenType.AND:
+            op = self.current_token.type
+            self.eat(op)
+            right = self.parse_comparison()
+
+            node = BinaryOp(left=node, operator=op, right=right)
+        return node
+
 
     def parse_logical_or(self):
         nade = self.parse_logical_and()
@@ -444,7 +452,7 @@ if __name__ == '__main__':
 
     tests = [
 
-        'do (x < 1){var x = 1}',
+        'do (x < 1 and x != 1){var x = 1}',
         'while (x < 1){var x = 1}',
         ' val a = 1',
         ' 1 > 1'

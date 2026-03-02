@@ -60,7 +60,7 @@ class BinaryOp(Expression):
         self.operator = operator
         self.right = right
 
-class UnaryOp(Expression):
+class UnaryOp(Expression): # класс для обработки унарных выражений
     def __init__(self, operator, expr):
         self.operator = operator
         self.expr = expr

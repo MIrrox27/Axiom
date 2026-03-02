@@ -35,39 +35,6 @@ class AxiomParser:
             # token_type - токен, который нам нужен
 
 
-    def parse_power(self): # парсит выражения с высшим приоритетом (допустим возведение в степень)
-        node = self.parse_primary()
-
-        while self.current_token.type == AxiomTokenType.POWER:
-            operator_token = self.current_token
-            self.eat(AxiomTokenType.POWER)
-            right = self.parse_power()
-
-            node = BinaryOp(
-                left=node,
-                operator=operator_token.type,
-                right=right
-            )
-        return node
-
-
-    def parse_mul_div_mod(self):
-        node = self.parse_power()
-         #
-        while self.current_token.type in (AxiomTokenType.MULTIPLY, AxiomTokenType.DIVIDE, AxiomTokenType.MOD):
-            operator_token = self.current_token
-            self.eat(operator_token.type)
-
-            right = self.parse_power()
-
-            node = BinaryOp(
-                left=node,
-                operator=operator_token.type,
-                right=right
-            )
-        return node
-
-
     def parse_primary(self):  # Парсит первичные выражения. Возвращает узел AST
         token = self.current_token
 
@@ -114,10 +81,56 @@ class AxiomParser:
             self.error(f"Received {token.type}", func='parse_primary')
 
 
+    def parse_unary(self): # обработка унарных операторов, пока только not, потом добавлю ++ и --
+        token = self.current_token
+
+        if token.type == AxiomTokenType.NOT:
+            self.eat(AxiomTokenType.NOT)
+            expr = self.parse_unary()
+            return UnaryOp(operator=token.type, expr=expr)
+        else:
+            self.parse_primary()
+
+
+
+    def parse_power(self): # парсит выражения с высшим приоритетом (допустим возведение в степень)
+        node = self.parse_primary()
+
+        while self.current_token.type == AxiomTokenType.POWER:
+            operator_token = self.current_token
+            self.eat(AxiomTokenType.POWER)
+            right = self.parse_power()
+
+            node = BinaryOp(
+                left=node,
+                operator=operator_token.type,
+                right=right
+            )
+        return node
+
+
+    def parse_mul_div_mod(self):
+        node = self.parse_power()
+         #
+        while self.current_token.type in (AxiomTokenType.MULTIPLY, AxiomTokenType.DIVIDE, AxiomTokenType.MOD):
+            operator_token = self.current_token
+            self.eat(operator_token.type)
+
+            right = self.parse_power()
+
+            node = BinaryOp(
+                left=node,
+                operator=operator_token.type,
+                right=right
+            )
+        return node
+
+
     def parse_add_sub(self): # парсит сложение и вычитание
         self.log(f"Start parse_add_sub(), token: {self.current_token}")
 
         node = self.parse_mul_div_mod()
+
         self.log(f"Parse 1st parse_term(), node: {node}, token: {self.current_token}")
 
         while self.current_token.type in (AxiomTokenType.PLUS, AxiomTokenType.MINUS):
@@ -162,6 +175,35 @@ class AxiomParser:
                 right=right
             )
         return node
+
+
+    def parse_logical_or(self):
+        pass
+
+    def parse_assignment(self):
+        func = 'parse_assignment'
+        node = self.parse_comparison()
+
+        if self.current_token.type == AxiomTokenType.ASSIGN:
+            if not isinstance(node, Identifier): # Потом добавим обработку присваивания массивам, спискам словарям и тп.
+                self.error("Left side of assignment must be a variable", func)
+
+            operator_token = self.current_token
+            self.eat(AxiomTokenType.ASSIGN)
+
+            right = self.parse_assignment()
+            node = BinaryOp(
+                left=node,
+                operator=operator_token,
+                right=right
+
+            )
+        return node
+
+
+    def parse_expression(self): # главный модуль, сделан для начала распределения парсинга
+        return self.parse_assignment()
+
 
 
     def parse_block(self):
@@ -383,31 +425,6 @@ class AxiomParser:
             if self.current_token.type == AxiomTokenType.SEMICOLON:
                 self.eat(AxiomTokenType.SEMICOLON)
             return ExpressionStmt(expr)
-
-
-    def parse_assignment(self):
-        func = 'parse_assignment'
-        node = self.parse_comparison()
-
-        if self.current_token.type == AxiomTokenType.ASSIGN:
-            if not isinstance(node, Identifier): # Потом добавим обработку присваивания массивам, спискам словарям и тп.
-                self.error("Left side of assignment must be a variable", func)
-
-            operator_token = self.current_token
-            self.eat(AxiomTokenType.ASSIGN)
-
-            right = self.parse_assignment()
-            node = BinaryOp(
-                left=node,
-                operator=operator_token,
-                right=right
-
-            )
-        return node
-
-
-    def parse_expression(self): # главный модуль, сделан для начала распределения парсинга
-        return self.parse_assignment()
 
 
 

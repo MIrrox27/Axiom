@@ -272,7 +272,6 @@ class AxiomParser:
         return DoStmt(condition=condition, body=body)
 
 
-
     def parse_for_statement(self):
         self.eat(AxiomTokenType.FOR)
         if self.current_token.type == AxiomTokenType.LPAREN:

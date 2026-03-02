@@ -20,6 +20,7 @@ class AxiomLexer:
             'elif': AxiomTokenType.ELIF,
             'else': AxiomTokenType.ELSE,
             'while': AxiomTokenType.WHILE,
+            'do': AxiomTokenType.DO,
             'for': AxiomTokenType.FOR,
             'foreach': AxiomTokenType.FOREACH,
             'var': AxiomTokenType.VAR,
@@ -34,6 +35,9 @@ class AxiomLexer:
             'config': AxiomTokenType.CONFIG,
             'is': AxiomTokenType.IS,
             'in': AxiomTokenType.IN,
+            'and': AxiomTokenType.AND,
+            'or': AxiomTokenType.OR,
+            'nill': AxiomTokenType.NILL,
             'return': AxiomTokenType.RETURN
         }
 
@@ -207,6 +211,24 @@ class AxiomLexer:
                 else:
                     return AxiomToken(AxiomTokenType.ASSIGN, line=self.line)
 
+            if self.current_char == '&':
+                self.advance()
+                if self.current_char == '&':
+                    self.advance()
+                    return AxiomToken(AxiomTokenType.AND)
+                else:
+                    self.error('[get_next_token] Where is the second "&" ?')
+
+            if self.current_char == '|':
+                self.advance()
+                if self.current_char == '|':
+                    self.advance()
+                    return AxiomToken(AxiomTokenType.OR)
+                else:
+                    self.error('[get_next_token] Where is the second "|" ?')
+
+
+
             if self.current_char == '!':
                 self.advance()
 
@@ -214,7 +236,7 @@ class AxiomLexer:
                     self.advance()
                     return AxiomToken(AxiomTokenType.NOT_EQUALS)
                 else:
-                    self.error("WHERE IS '=' AFTER '!' ???")
+                    return AxiomToken(AxiomTokenType.NOT)
 
             if self.current_char == '<':
                 self.advance()

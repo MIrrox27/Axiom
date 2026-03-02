@@ -205,26 +205,6 @@ class AxiomParser:
         return  VarDeclaration(keyword_token.type, name=name, value=value)
 
 
-    def parse_assignment(self):
-        node = self.parse_comparison()
-
-        if self.current_token.type == AxiomTokenType.ASSIGN:
-            if not isinstance(node, Identifier): # Потом добавим обработку присваивания массивам, спискам словарям и тп.
-                self.error("[parse_assignment] Left side of assignment must be a variable")
-
-            operator_token = self.current_token
-            self.eat(AxiomTokenType.ASSIGN)
-
-            right = self.parse_assignment()
-            node = BinaryOp(
-                left=node,
-                operator=operator_token,
-                right=right
-
-            )
-        return node
-
-
     def parse_if_statement(self): # парсинг if/elif/else
         self.eat(AxiomTokenType.IF) # съедаем if
 
@@ -283,7 +263,7 @@ class AxiomParser:
 
         if self.current_token.type == AxiomTokenType.LPAREN:
             self.eat(AxiomTokenType.LPAREN)
-            condition = self.parse_assignment()
+            condition = self.parse_expression()
             self.eat(AxiomTokenType.RPAREN)
         else:
             self.error(f'[parse_while_statement] where is "(" ?')
@@ -401,6 +381,24 @@ class AxiomParser:
             return ExpressionStmt(expr)
 
 
+    def parse_assignment(self):
+        node = self.parse_comparison()
+
+        if self.current_token.type == AxiomTokenType.ASSIGN:
+            if not isinstance(node, Identifier): # Потом добавим обработку присваивания массивам, спискам словарям и тп.
+                self.error("[parse_assignment] Left side of assignment must be a variable")
+
+            operator_token = self.current_token
+            self.eat(AxiomTokenType.ASSIGN)
+
+            right = self.parse_assignment()
+            node = BinaryOp(
+                left=node,
+                operator=operator_token,
+                right=right
+
+            )
+        return node
 
 
     def parse_expression(self): # главный модуль, сделан для начала распределения парсинга

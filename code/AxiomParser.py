@@ -176,9 +176,20 @@ class AxiomParser:
             )
         return node
 
+    def parse_logical_and(self):
+        pass
 
     def parse_logical_or(self):
-        pass
+        nade = self.parse_logical_and()
+        while self.current_token.type == AxiomTokenType.OR:
+            op = self.current_token.type
+            self.eat(op)
+            right = self.parse_logical_and()
+
+            node = BinaryOp(left=node, operator=op, right=right)
+        return node
+
+
 
     def parse_assignment(self):
         func = 'parse_assignment'

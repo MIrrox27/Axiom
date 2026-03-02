@@ -38,6 +38,7 @@ class AxiomLexer:
             'and': AxiomTokenType.AND,
             'or': AxiomTokenType.OR,
             'nill': AxiomTokenType.NILL,
+            'not': AxiomTokenType.NOT,
             'return': AxiomTokenType.RETURN
         }
 
@@ -325,7 +326,7 @@ class AxiomLexer:
 
 
 if __name__ == "__main__":
-    test_code = "**"
+    test_code = "not, var, val, name, nill, or, ||, !, and, &&, is, in, do (i > 1) {var x_name_1 = 1}"
     lexer = AxiomLexer(test_code)
     while True:
         token = lexer.get_next_token()

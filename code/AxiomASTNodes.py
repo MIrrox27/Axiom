@@ -7,8 +7,9 @@ class Error:
     def __init__(self, module):
         self.module = module
 
-    def error(self,message):
-        raise Exception(f'[{self.module}]: {message}')
+
+    def error(self, message, func):
+        raise Exception(f'[{self.module}]: [{func}] {message}')
 
 
 class ASTNode:
@@ -58,6 +59,11 @@ class BinaryOp(Expression):
         self. left = left
         self.operator = operator
         self.right = right
+
+class UnaryOp(Expression):
+    def __init__(self, operator, expr):
+        self.operator = operator
+        self.expr = expr
 
 
 
@@ -197,6 +203,7 @@ class WhileStmt(Statement): # обычный цикл while
         self.condition = condition # условие при котором цикл выполняется
         self.body = body # тело цикла
 
+
 class DoStmt(Statement):
     """
                 Цикл Do (как do while в других языках, например Java) объявление:
@@ -209,6 +216,7 @@ class DoStmt(Statement):
     def __init__(self, body, condition):
         self.body = body
         self.condition = condition
+
 
 class ForStmt(Statement): # обычный цикл for
     def __init__(self, initializer, condition, increment, body):
@@ -223,7 +231,6 @@ class ForeachStmt(Statement): # цикл для перебора
         self.variable = variable # переменная, которая превращается в каждый элемент
         self.iterable = iterable # список, массив и т.п
         self.body = body # тело цикла
-
 
 
 

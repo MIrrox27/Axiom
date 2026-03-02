@@ -14,6 +14,7 @@ class AxiomParser:
         self.current_token = self.lexer.get_next_token()
         self.debug = debug
         self.loop_for = False
+        self.ERROR = Error("AxiomParser")
 
 
     def log(self, message):
@@ -21,15 +22,16 @@ class AxiomParser:
             print(f'[Parser DEBUG]: {message}, line: {self.lexer.line}, position: {self.lexer.position}, current char: "{self.lexer.current_char}"')
 
 
-    def error(self, message):
+    def error(self, message, func):
         self.loop_for = False
-        raise Exception(f'[Parser Error]: {message}, line: {self.lexer.line}, position: {self.lexer.position}, current char: "{self.lexer.current_char}"')
+        self.ERROR.error(message=f'{message}, line: {self.lexer.line}, position: {self.lexer.position}, current char: "{self.lexer.current_char}"', func=func)
 
     def eat(self, token_type): # Проверяет, что текущий токен имеет ожидаемый тип
         if self.current_token.type == token_type:
+            self.log(f'[eat] received: [{token_type}]')
             self.current_token = self.lexer.get_next_token()
         else:
-            self.error(f"[eat] Pending {token_type}, received {self.current_token.type}") # self.current_token.type - тип токена который мы получили,
+            self.error(f"Pending {token_type}, received {self.current_token.type}") # self.current_token.type - тип токена который мы получили,
             # token_type - токен, который нам нужен
 
 
@@ -70,49 +72,46 @@ class AxiomParser:
         token = self.current_token
 
         if token.type in (AxiomTokenType.INTEGER, AxiomTokenType.FLOAT): #
-            self.log(f'received: [{token.type}]')
             self.eat(token.type)
             return Literal(token.value)
 
         elif token.type == AxiomTokenType.STRING:
-            self.log(f'received: [{token.type}]')
             self.eat(token.type)
             return Literal(token.value)
 
+        elif token.type == AxiomTokenType.NILL:
+            self.eat(token.type)
+
+
         elif token.type == AxiomTokenType.BOOL:
-            self.log(f'received: [{token.type}]', )
             self.eat(token.type)
             return  Literal(token.value)
 
         elif token.type == AxiomTokenType.IDENTIFIER:
-            self.log(f'received: [{token.type}]')
             self.eat(token.type)
             return Identifier(token.value)
 
 
         elif token.type == AxiomTokenType.LPAREN:
-            self.log(f'received: [{token.type}]')
             self.eat(AxiomTokenType.LPAREN) #
             node = self.parse_expression()  # Рекурсивно парсим выражение внутри
             self.eat(AxiomTokenType.RPAREN) #
             return node
 
         elif token.type == AxiomTokenType.LBRACE:
-            self.log(f'received: [{token.type}]')
             self.eat(AxiomTokenType.LBRACE) #
             node = self.parse_expression()  # Рекурсивно парсим выражение внутри
             self.eat(AxiomTokenType.RBRACE) #
             return node
 
         elif token.type == AxiomTokenType.LBRACKET:
-            self.log(f'received: [{token.type}]')
             self.eat(AxiomTokenType.LBRACKET)  #
             node = self.parse_expression()     # Рекурсивно парсим выражение внутри
             self.eat(AxiomTokenType.RBRACKET)  #
             return node
 
         else:
-            self.error(f"[parse_primari] Received {token.type}")
+            self.error(f"Received {token.type}", func='parse_primary')
 
 
     def parse_add_sub(self): # парсит сложение и вычитание
@@ -166,13 +165,14 @@ class AxiomParser:
 
 
     def parse_block(self):
+        func = 'parse_block'
         self.eat(AxiomTokenType.LBRACE)
 
         statements = []
 
         while self.current_token.type != AxiomTokenType.RBRACE:
             if self.current_token == AxiomTokenType.EOF:
-                self.error("Block not closed, pending '}'")
+                self.error("Block not closed, pending '}'", func)
 
             stmt = self.parse_statement()
             statements.append(stmt)
@@ -182,11 +182,12 @@ class AxiomParser:
 
 
     def parse_var_declaration(self, loop:bool = False): # парсит объявление переменной
+        func = 'parse_var_declaration'
         keyword_token = self.current_token
         self.eat(keyword_token.type)
 
         if self.current_token.type != AxiomTokenType.IDENTIFIER:    # получаем имя переменной
-            self.error(f'After {keyword_token.type} pending main value')
+            self.error(f'After {keyword_token.type} pending main value', func=func)
 
         name = self.current_token.value
         self.eat(AxiomTokenType.IDENTIFIER)
@@ -197,7 +198,7 @@ class AxiomParser:
             value = self.parse_expression()
 
         if keyword_token.type == AxiomTokenType.VAL and value is None:
-            self.error(f"Const '{name}' must have a main value")
+            self.error(f"Const '{name}' must have a main value", func=func)
 
         if self.current_token.type == AxiomTokenType.SEMICOLON and not loop:
             self.eat(AxiomTokenType.SEMICOLON)
@@ -245,6 +246,7 @@ class AxiomParser:
 
 
     def parse_while_statement(self):
+        func = 'parse_while_statement'
         self.eat(AxiomTokenType.WHILE)
 
         if self.current_token.type == AxiomTokenType.LPAREN:
@@ -252,13 +254,14 @@ class AxiomParser:
             condition = self.parse_expression()
             self.eat(AxiomTokenType.RPAREN)
         else:
-            self.error(f'[parse_while_statement] where is "(" ?')
+            self.error(f'where is "(" ?', func)
 
         body = self.parse_block()
         return WhileStmt(condition=condition, body=body)
 
 
     def parse_do_statement(self):
+        func = 'parse_do_statement'
         self.eat(AxiomTokenType.DO)
 
         if self.current_token.type == AxiomTokenType.LPAREN:
@@ -266,13 +269,14 @@ class AxiomParser:
             condition = self.parse_expression()
             self.eat(AxiomTokenType.RPAREN)
         else:
-            self.error(f'[parse_while_statement] where is "(" ?')
+            self.error(f'where is "(" ?', func)
 
         body = self.parse_block()
         return DoStmt(condition=condition, body=body)
 
 
     def parse_for_statement(self):
+        func = 'parse_for_statement'
         self.eat(AxiomTokenType.FOR)
         if self.current_token.type == AxiomTokenType.LPAREN:
             self.loop_for = True
@@ -285,7 +289,7 @@ class AxiomParser:
             elif self.current_token.type == AxiomTokenType.VAR:
                 initializer = self.parse_var_declaration(loop=True)
             elif self.current_token.type == AxiomTokenType.VAL:
-                return self.error("[parse_for_statement] you can't use constants in loop")
+                return self.error("you can't use constants in loop", func)
             else:
                 initializer = self.parse_expression()
             self.eat(AxiomTokenType.SEMICOLON)
@@ -311,28 +315,29 @@ class AxiomParser:
             return ForStmt(initializer=initializer, condition=condition, increment=increment, body=body)
 
         else:
-            return self.error("[parse_for_statement] Where is '(' after 'for'?")
+            return self.error("Where is '(' after 'for'?", func)
 
 
 
     def parse_foreach_statement(self):
+        func = 'parse_foreach_statement'
         self.eat(AxiomTokenType.FOREACH)
 
         if self.current_token.type == AxiomTokenType.VAR:
             self.eat(AxiomTokenType.VAR)
 
         elif self.current_token.type == AxiomTokenType.VAL:
-            self.error("[parse_foreach_statement] you can't use ")
+            self.error("you can't use 'val' in this loop", func)
 
 
         if self.current_token.type != AxiomTokenType.IDENTIFIER:
-            self.error("[parse_foreach_statement] After the loop a variable is expected")
+            self.error("After the loop a variable is expected", func)
 
         var_name = self.current_token.value
         self.eat(AxiomTokenType.IDENTIFIER)
 
         if self.current_token.type != AxiomTokenType.IN:
-            self.error("[parse_foreach_statement] After the variable expected 'in'")
+            self.error("After the variable expected 'in'", func)
         self.eat(AxiomTokenType.IN)
 
         iterable = self.parse_expression()
@@ -381,11 +386,12 @@ class AxiomParser:
 
 
     def parse_assignment(self):
+        func = 'parse_assignment'
         node = self.parse_comparison()
 
         if self.current_token.type == AxiomTokenType.ASSIGN:
             if not isinstance(node, Identifier): # Потом добавим обработку присваивания массивам, спискам словарям и тп.
-                self.error("[parse_assignment] Left side of assignment must be a variable")
+                self.error("Left side of assignment must be a variable", func)
 
             operator_token = self.current_token
             self.eat(AxiomTokenType.ASSIGN)

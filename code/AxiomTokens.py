@@ -40,6 +40,7 @@ class AxiomTokenType(Enum):
     AND = 'AND' # Ключевое слово and
     OR = 'OR' # Ключевое слово or
     NILL = 'NILL' # Ключевое слово nill
+    NOT = 'NOT' # Ключевое слово not, так же может обозначаться знаком "!"
 
 
 

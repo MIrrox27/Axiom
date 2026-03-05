@@ -48,7 +48,7 @@ class AxiomParser:
 
         elif token.type == AxiomTokenType.NILL:
             self.eat(token.type)
-
+            return Literal(None)
 
         elif token.type == AxiomTokenType.BOOL:
             self.eat(token.type)
@@ -89,12 +89,12 @@ class AxiomParser:
             expr = self.parse_unary()
             return UnaryOp(operator=token.type, expr=expr)
         else:
-            self.parse_primary()
+            return self.parse_primary()
 
 
 
     def parse_power(self): # парсит выражения с высшим приоритетом (допустим возведение в степень)
-        node = self.parse_primary()
+        node = self.parse_unary()
 
         while self.current_token.type == AxiomTokenType.POWER:
             operator_token = self.current_token
@@ -188,7 +188,7 @@ class AxiomParser:
 
 
     def parse_logical_or(self):
-        nade = self.parse_logical_and()
+        node = self.parse_logical_and()
         while self.current_token.type == AxiomTokenType.OR:
             op = self.current_token.type
             self.eat(op)
@@ -201,7 +201,7 @@ class AxiomParser:
 
     def parse_assignment(self):
         func = 'parse_assignment'
-        node = self.parse_comparison()
+        node = self.parse_logical_or()
 
         if self.current_token.type == AxiomTokenType.ASSIGN:
             if not isinstance(node, Identifier): # Потом добавим обработку присваивания массивам, спискам словарям и тп.
@@ -211,16 +211,11 @@ class AxiomParser:
             self.eat(AxiomTokenType.ASSIGN)
 
             right = self.parse_assignment()
-            node = BinaryOp(
-                left=node,
-                operator=operator_token,
-                right=right
-
-            )
+            node = BinaryOp(left=node, operator=operator_token, right=right)
         return node
 
 
-    def parse_expression(self): # главный модуль, сделан для начала распределения парсинга
+    def parse_expression(self): # главный модуль, сделан для начала парсинга
         return self.parse_assignment()
 
 
@@ -452,8 +447,8 @@ if __name__ == '__main__':
 
     tests = [
 
-        'do (x < 1 and x != 1){var x = 1}',
-        'while (x < 1){var x = 1}',
+        'do (x < 1){var x = 1}',
+        'while (x < 1 and x == 2){var x = 1}',
         ' val a = 1',
         ' 1 > 1'
 

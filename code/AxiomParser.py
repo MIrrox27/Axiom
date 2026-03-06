@@ -176,7 +176,7 @@ class AxiomParser:
             )
         return node
 
-    def parse_logical_and(self):
+    def parse_logical_and(self): # обработка логического and
         node = self.parse_comparison()
         while self.current_token.type == AxiomTokenType.AND:
             op = self.current_token.type
@@ -187,7 +187,7 @@ class AxiomParser:
         return node
 
 
-    def parse_logical_or(self):
+    def parse_logical_or(self): # обработка логического or
         node = self.parse_logical_and()
         while self.current_token.type == AxiomTokenType.OR:
             op = self.current_token.type
@@ -199,7 +199,7 @@ class AxiomParser:
 
 
 
-    def parse_assignment(self):
+    def parse_assignment(self): # парсинг присвоения
         func = 'parse_assignment'
         node = self.parse_logical_or()
 

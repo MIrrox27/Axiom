@@ -196,7 +196,11 @@ class AxiomLexer:
 
             if self.current_char == '/':
                 self.advance()
-                return AxiomToken(AxiomTokenType.DIVIDE, line=self.line)
+                if self.current_char == '/':  # Комментарий //
+                    self.skip_comment()
+                    continue
+                else:
+                    return AxiomToken(AxiomTokenType.DIVIDE, line=self.line)
 
             if self.current_char == '%':
                 self.advance()
@@ -301,12 +305,6 @@ class AxiomLexer:
             if self.current_char == "#":  # если символ который мы проверяем равен символу комментария ( я сделал 2 символа комментариев)
                 self.skip_comment()  # то мы вызываем функцию для пропуска коммментов
                 continue  # continue начинает цикл заново с нового символа. Это гарантирует, что после пропуска пробелов/комментариев мы обработаем следующий значимый символ
-
-            if self.current_char == '/':
-                self.advance()
-                if self.current_char == '/':  # Комментарий //
-                    self.skip_comment()
-                    continue
 
             if self.current_char is not None and (self.current_char.isalpha() or self.current_char == '_'):
                 identifier = self.read_identifier()

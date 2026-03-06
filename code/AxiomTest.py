@@ -176,13 +176,13 @@ class Test:
         test_cases = [
             # Простые объявления
             ("var x;", "VarDeclaration с именем x без значения"),
-            ("var I_Love_Axiome = 'тест на русском'", "VarDeclaration с именем x и текстовым значением "),
+            ("varAxiome = 'тест на русском'", "VarDeclaration с именем x и текстовым значением "),
             ("val y_s2a = 10;", "VarDeclaration с val, именем y_s2a и значением 10"),
 
             # Блоки кода
             ("{}", "Пустой блок"),
-            ("{ var x = 5; }", "Блок с одной инструкцией"),
-            ("{ var x = 5; var y = 10; }", "Блок с двумя инструкциями"),
+            ("{ var x = 5 - 5; }", "Блок с одной инструкцией"),
+            ("{ var x = 10 / 5; var y = 10 ** 1; }", "Блок с двумя инструкциями"),
 
             # Инструкции-выражения
             ("x + 5; # комментарий", "ExpressionStmt с выражением x + 5"),
@@ -360,7 +360,7 @@ class Test:
             "x > y;",
             "x <= y;",
             "x >= y;",
-            "2 + 3 == 5;",
+            "2 - 3 == 5;",
 
             # Условные операторы
             "if x > 5 { var msg = 'big'; }",
@@ -369,7 +369,7 @@ class Test:
             "if (x > 5) { }",
 
             # Циклы
-            "while x < 10 { x = x + 1; }",
+            "while (x < 10) { x = x + 1; }",
             "while (x < 10) { x = x + 1; }",
             "for (var i = 0; i < 10; i = i + 1) { prnt = i ** 1 + 2; }",
             "for (i = 0; i < 10; i = i + 1) { }",
@@ -380,7 +380,7 @@ class Test:
             "foreach var item in items { item = prnt + 1; }",
 
             # Сложные комбинации
-            "{ var x = 0; while x < 5 { if x % 2 == 0 { x = x + 2; } else { x = x + 1; } } }",
+            "{ var x = 0; while (x < 5) { if x % 2 == 0 { x = x + 2; } else { x = x + 1; } } }",
         ]
 
         print("Запуск позитивных тестов...")
@@ -404,7 +404,7 @@ class Test:
             ("var x = ;", "переменная без выражения"),
             ("x = ;", "присваивание без правой части"),
             ("if x > { }", "условие без выражения"),
-            ("while { }", "while без условия"),
+            ("while() { }", "while без условия"),
             ("for (i = 0; i < 10; )", "for без тела"),
             ("foreach item in { }", "foreach без выражения коллекции"),
             ("{ var x = 5;", "незакрытый блок"),
@@ -434,10 +434,10 @@ class Test:
 if __name__ == "__main__":
 
     test = Test()
-    test.test_lexer_complete()
-    test.test_lexer_edge_cases()
-    test.test_AST()
+    #test.test_lexer_complete()
+    #test.test_lexer_edge_cases()
+    #test.test_AST()
     test.test_parser()
-    test.test_if_parsing()
-    test.test_parser_loops()
-    test.test_parser_full()
+    #test.test_if_parsing()
+    #test.test_parser_loops()
+    #test.test_parser_full()

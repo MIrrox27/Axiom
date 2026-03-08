@@ -3,24 +3,52 @@
 
 from AxiomASTNodes import *
 
+class Error:
+    def __init__(self, module):
+        self.module = module
 
+    def error(self, message, func):
+        raise Exception(f'[{self.module}]: [{func}] {message}')
 
 class AxiomEnvironment: #
-    def __init__(self):
+    def __init__(self, parent=None):
         self.variables = {}
+        self.parent = parent
+        self.error = Error(module='AxiomEnvironment')
+
+    def env_error(self, message, func):
+       return self.error.error(message=message, func=func)
 
     def define(self, name, value): # определение новой переменной в текущем окружении или перезаписывает текущую
         self.variables[name] = value
 
+
     def get(self, name): # возвращает значение переменной
         if name in self.variables:
             return self.variables[name]
-        raise Exception(f'Undefined variable: {name}')
+
+        if self.parent is not None:
+            return self.parent.get(name)
+        # raise Exception(f"Variable '{name}' is not defined")
+        return self.env_error(message="Variable '{name}' is not defined", func='set')
+
+
+    def set(self, name, value): # изменение значения переменной, не работает с необъявленными переменными
+        if name in self.variables:
+            self.variables[name] = value
+            return
+        if self.parent is not None:
+            self.parent.set(name, value)
+            return
+
+        #raise Exception(f"Variable '{name}' is not defined")
+        return self.env_error(message="Variable '{name}' is not defined", func='set')
 
 
 
 class AxiomInterpreter: # класс интерпретатора
     def __init__(self):
+        self.error = Error(module='AxiomEnvironment')
         self.env = AxiomEnvironment() # класс с глобальным окружением
 
     def visit(self, node): # основной метод создания
@@ -29,7 +57,8 @@ class AxiomInterpreter: # класс интерпретатора
         return method(node)
 
     def visit_error(self, node): # метод ошибки
-        raise Exception(f'No visit method for {type(node).__name__}')
+        return self.error.error(func='visit_error', message=f'No visit method for {type(node).__name__}')
+        #raise Exception(f'No visit method for {type(node).__name__}')
 
     def visit_Literal(self, node): #
         return node.value

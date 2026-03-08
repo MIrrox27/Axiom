@@ -7,7 +7,6 @@ class Error:
     def __init__(self, module):
         self.module = module
 
-
     def error(self, message, func):
         raise Exception(f'[{self.module}]: [{func}] {message}')
 

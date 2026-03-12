@@ -97,12 +97,41 @@ class AxiomInterpreter: # класс интерпретатора
 
         return None
 
-    def visit_ExpressionStmt(self, node):
+    def visit_ExpressionStmt(self, node): # временно делаем
 
         self.visit(self, node) # Вычисляем выражение, результат отбрасываем
         return None
 
 
+    def visit_BinaryOp(self, node): # выполняет бинарную операцию
+        left_val = self.visit(node.left)
+
+        if node.oprrator == AxiomTokenType.AND:
+            if not self.is_truthy(left_val):
+                return False
+
+            right_val = self.visit(node.right)
+            return self.is_truthy(right_val)
+
+
+
+    def is_truthy(self, value): # смотрит, является ли значение истинным
+        # в Axiom false, 0 и nill считаются ложными, все остальное истинными
+        if value is False or value is None:
+            return False
+
+        if isinstance(value, bool): # true
+            return True
+
+        if isinstance(value, (int, float)):
+            return value != 0
+
+        if isinstance(value, str):
+            return bool(value)
+
+        # тут будут еще проверки
+
+        return True
 
 
 

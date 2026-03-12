@@ -7,14 +7,18 @@ class Error:
     def __init__(self, module):
         self.module = module
 
+
     def error(self, message, func):
         raise Exception(f'[{self.module}]: [{func}] {message}')
+
+
 
 class AxiomEnvironment: #
     def __init__(self, parent=None):
         self.variables = {}
         self.parent = parent
         self.error = Error(module='AxiomEnvironment')
+
 
     def env_error(self, message, func):
        return self.error.error(message=message, func=func)
@@ -33,7 +37,7 @@ class AxiomEnvironment: #
         return self.env_error(message="Variable '{name}' is not defined", func='set')
 
 
-    def set(self, name, value): # изменение значения переменной, не работает с необъявленными переменными
+    def set(self, name, value): # Изменение значения переменной, не работает с необъявленными переменными
         if name in self.variables:
             self.variables[name] = value
             return
@@ -51,20 +55,56 @@ class AxiomInterpreter: # класс интерпретатора
         self.error = Error(module='AxiomEnvironment')
         self.env = AxiomEnvironment() # класс с глобальным окружением
 
+
     def visit(self, node): # основной метод создания
         method_name = f'visit_{type(node).__name__}'
         method = getattr(self, method_name, self.visit_error)
         return method(node)
 
+
     def visit_error(self, node): # метод ошибки
         return self.error.error(func='visit_error', message=f'No visit method for {type(node).__name__}')
         #raise Exception(f'No visit method for {type(node).__name__}')
 
+
     def visit_Literal(self, node): #
         return node.value
 
+
     def visit_Identifier(self, node): #
         return self.env.get(node.name)
+
+
+    def visit_VarDeclaration(self, node):
+        value = None
+        if node.value is not None:
+            value = self.visit(node.value)
+
+        self.env.define(node.name, value)
+        return None
+
+
+    def visit_Block(self, node):
+        previous_env = self.env # создаем новое окружение для бока
+        self.env = AxiomEnvironment(previous_env)
+
+        try:
+            for stmt in node.statements:
+                self.visit(stmt)
+
+        finally:
+            self.env = previous_env # восстанавливаем окружение
+
+        return None
+
+    def visit_ExpressionStmt(self, node):
+
+        self.visit(self, node) # Вычисляем выражение, результат отбрасываем
+        return None
+
+
+
+
 
 
 

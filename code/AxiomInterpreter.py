@@ -203,6 +203,17 @@ class AxiomInterpreter: # класс интерпретатора
             self.visit(node.else_branch)
 
 
+    def visit_WhileStmt(self, node):
+        while True:
+            condition_value = self.visit(node.condition)
+            if not self.is_truthy(condition_value):
+                break
+            self.visit(node.body)
+
+        return None
+
+
+
 
         # Вспомогательные функции для проверки типов
     def is_truthy(self, value): # смотрит, является ли значение истинным

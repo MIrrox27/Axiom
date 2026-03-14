@@ -189,6 +189,20 @@ class AxiomInterpreter: # класс интерпретатора
             self.error.raise_error(f"Unknown binary operator: {node.operator}", func='visit_BinaryOp')
 
 
+    def visit_IfStmt(self, node):
+        if self.is_truthy(self.visit(node.condition)):
+            self.visit(node.than_branch)
+            return None
+
+        for elif_clause in node.elif_branches:
+            if self.is_truthy(self.visit(elif_clause.condition)):
+                self.visit(elif_clause.block)
+                return None
+
+        if node.else_branch is not None:
+            self.visit(node.else_branch)
+
+
 
         # Вспомогательные функции для проверки типов
     def is_truthy(self, value): # смотрит, является ли значение истинным

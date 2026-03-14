@@ -75,6 +75,8 @@ class AxiomInterpreter: # класс интерпретатора
         return self.env.get(node.name)
 
 
+
+
     def visit_VarDeclaration(self, node):
         value = None
         if node.value is not None:
@@ -98,22 +100,21 @@ class AxiomInterpreter: # класс интерпретатора
         return None
 
     def visit_ExpressionStmt(self, node): # временно делаем
-
-        self.visit(self, node) # Вычисляем выражение, результат отбрасываем
+        self.visit(node.expression) # Вычисляем выражение, результат отбрасываем
         return None
 
 
     def visit_BinaryOp(self, node): # выполняет бинарную операцию
         left_val = self.visit(node.left)
 
-        if node.oprrator == AxiomTokenType.AND: # если левый операнд ложный, результат - False, правый нет смысла вычислять
+        if node.operator == AxiomTokenType.AND: # если левый операнд ложный, результат - False, правый нет смысла вычислять
             if not self.is_truthy(left_val):
                 return False
 
             right_val = self.visit(node.right)
             return self.is_truthy(right_val)
 
-        elif node.oprrator == AxiomTokenType.OR:  # если левый операнд истинный, результат - True, правый нет смысла вычислять
+        elif node.operator == AxiomTokenType.OR:  # если левый операнд истинный, результат - True, правый нет смысла вычислять
             if self.is_truthy(left_val):
                 return True
 
@@ -170,11 +171,25 @@ class AxiomInterpreter: # класс интерпретатора
 
 
 if __name__ == '__main__':
-    ast = Identifier('x')
+    # Программа: var x = 5; x = x + 2;
+    # Создаём узлы
+    var_decl = VarDeclaration(AxiomTokenType.VAR, 'x', Literal(5))
+    # x + 2
+    add_op = BinaryOp(Identifier('x'), AxiomTokenType.PLUS, Literal(2))
+    # присваивание x = x + 2
+    assign = BinaryOp(Identifier('x'), AxiomTokenType.ASSIGN, add_op)
+    # оборачиваем присваивание в ExpressionStmt (так как это инструкция-выражение)
+    assign_stmt = ExpressionStmt(assign)
+    # программа из двух инструкций
+    program = [var_decl, assign_stmt]
+
+    # Интерпретируем
     interp = AxiomInterpreter()
-    interp.env.define('x', 42)
-    result = interp.visit(ast)
-    print(result)  # Должно вывести 42
+    for stmt in program:
+        interp.visit(stmt)
+
+    # Проверим значение x
+    print(interp.env.get('x'))  # должно быть 7
 
 
 

@@ -122,6 +122,15 @@ class AxiomInterpreter: # класс интерпретатора
             right_val = self.visit(node.right)
             return self.is_truthy(right_val)
 
+        elif node.operator == AxiomTokenType.ASSIGN:
+            if not isinstance(node.left, Identifier):
+                self.error.raise_error("Left side of assignment must be a variable", func='visit_BinaryOp')
+
+            right_val = self.visit(node.right) # вычисляем значение переменной
+            self.env.set(node.left.name, right_val) # сохраняем переменную
+
+            return right_val # присваивание возвращает присвоенное значение
+
         right_val = self.visit(node.right)
 
         # Арифметические операторы (возвращают результат)

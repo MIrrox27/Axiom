@@ -13,7 +13,6 @@ class Error:
         raise Exception(f'[{self.module}]: [{func}] {message}')
 
 
-
 class AxiomEnvironment: #
     def __init__(self, parent=None):
         self.variables = {}
@@ -50,7 +49,6 @@ class AxiomEnvironment: #
         self.env_error(message="Variable '{name}' is not defined", func='set')
 
 
-
 class AxiomInterpreter: # класс интерпретатора
     def __init__(self):
         self.error = Error(module='AxiomEnvironment')
@@ -76,8 +74,6 @@ class AxiomInterpreter: # класс интерпретатора
         return self.env.get(node.name)
 
 
-
-
     def visit_VarDeclaration(self, node):
         value = None
         if node.value is not None:
@@ -100,6 +96,7 @@ class AxiomInterpreter: # класс интерпретатора
 
         return None
 
+
     def visit_ExpressionStmt(self, node): # временно делаем
         self.visit(node.expression) # Вычисляем выражение, результат отбрасываем
         return None
@@ -108,6 +105,7 @@ class AxiomInterpreter: # класс интерпретатора
     def visit_BinaryOp(self, node): # выполняет бинарную операцию
         left_val = self.visit(node.left)
 
+        # особые операторы
         if node.operator == AxiomTokenType.AND: # если левый операнд ложный, результат - False, правый нет смысла вычислять
             if not self.is_truthy(left_val):
                 return False
@@ -166,7 +164,6 @@ class AxiomInterpreter: # класс интерпретатора
             return left_val ** right_val
 
         # Операторы сравнения (возвращают true / false)
-
         elif node.operator == AxiomTokenType.EQUALS:
             return left_val == right_val
 
@@ -189,7 +186,7 @@ class AxiomInterpreter: # класс интерпретатора
             self.error.raise_error(f"Unknown binary operator: {node.operator}", func='visit_BinaryOp')
 
 
-    def visit_IfStmt(self, node):
+    def visit_IfStmt(self, node): # Обработка if
         if self.is_truthy(self.visit(node.condition)):
             self.visit(node.than_branch)
             return None
@@ -203,16 +200,14 @@ class AxiomInterpreter: # класс интерпретатора
             self.visit(node.else_branch)
 
 
-    def visit_WhileStmt(self, node):
-        while True:
-            condition_value = self.visit(node.condition)
+    def visit_WhileStmt(self, node): # обработка while
+        while True:  # пока условие верное, выполняем действия
+            condition_value = self.visit(node.condition) # если условие ложное - выходим
             if not self.is_truthy(condition_value):
                 break
             self.visit(node.body)
 
         return None
-
-
 
 
         # Вспомогательные функции для проверки типов
@@ -257,7 +252,6 @@ class AxiomInterpreter: # класс интерпретатора
 
         if not isinstance(left, (int, float, str)):
             self.error.raise_error(func='_check_comparable', message=f"Operator {op} not supported for {type(left).__name__}")
-
 
 
 

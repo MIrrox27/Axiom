@@ -106,20 +106,12 @@ class AxiomInterpreter: # класс интерпретатора
     def visit_BinaryOp(self, node): # выполняет бинарную операцию
         left_val = self.visit(node.left)
 
-        if node.oprrator == AxiomTokenType.AND: # если левый операнд ложный, результат - False, правый нет смысла вычислять
+        if node.oprrator == AxiomTokenType.AND:
             if not self.is_truthy(left_val):
                 return False
 
             right_val = self.visit(node.right)
             return self.is_truthy(right_val)
-
-        elif node.oprrator == AxiomTokenType.OR:  # если левый операнд истинный, результат - True, правый нет смысла вычислять
-            if self.is_truthy(left_val):
-                return True
-
-            right_val = self.visit(node.right)
-            return self.is_truthy(right_val)
-
 
 
         # Вспомогательные функции для проверки типов
@@ -155,15 +147,6 @@ class AxiomInterpreter: # класс интерпретатора
             return
 
         self.error.raise_error(func='_check_numeric', message=f'Operator {op} requires both numbers or both string')
-
-
-    def _check_comparable(self, left, right, op): # проверяет что операнды можно сравнивать
-
-        if type(left) != type(right):
-            self.error.raise_error(func='_check_comparable', message=f"Operator {op} requires operands of the same type")
-
-        if not isinstance(left, (int, float, str)):
-            self.error.raise_error(func='_check_comparable', message=f"Operator {op} not supported for {type(left).__name__}")
 
 
 

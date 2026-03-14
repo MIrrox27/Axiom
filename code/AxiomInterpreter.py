@@ -2,6 +2,7 @@
 # AxiomInterpreter.py
 
 from AxiomASTNodes import *
+from AxiomTokens import *
 
 class Error:
     def __init__(self, module):
@@ -121,6 +122,63 @@ class AxiomInterpreter: # класс интерпретатора
             right_val = self.visit(node.right)
             return self.is_truthy(right_val)
 
+        right_val = self.visit(node.right)
+
+        # Арифметические операторы (возвращают результат)
+        if node.operator == AxiomTokenType.PLUS:
+            self._check_numeric_or_string(left_val, right_val, node.operator)
+            return left_val + right_val
+
+        elif node.operator == AxiomTokenType.MINUS:
+            self._check_numeric(right_val, left_val, node.operator)
+            return left_val - right_val
+
+        elif node.operator == AxiomTokenType.MULTIPLY:
+            self._check_numeric(left_val, right_val, node.operator)
+            return left_val * right_val
+
+        elif node.operator == AxiomTokenType.DIVIDE:
+            self._check_numeric(left_val, right_val, node.operator)
+
+            if right_val == 0:
+                self.error.raise_error(f"Division by zero", func='visit_BinaryOp')
+            return left_val / right_val
+
+        elif node.operator == AxiomTokenType.MOD:
+            self._check_numeric(left_val, right_val, node.operator)
+
+            if right_val == 0:
+                self.error.raise_error(f"Division by zero", func='visit_BinaryOp')
+
+            return left_val % right_val
+
+        elif node.operator == AxiomTokenType.POWER:
+            self._check_numeric(left_val, right_val, node.operator)
+            return left_val ** right_val
+
+        # Операторы сравнения (возвращают true / false)
+
+        elif node.operator == AxiomTokenType.EQUALS:
+            return left_val == right_val
+
+        elif node.operator == AxiomTokenType.NOT_EQUALS:
+            return left_val != right_val
+
+        elif node.operator == AxiomTokenType.LESS:
+            return  left_val < right_val
+
+        elif node.operator == AxiomTokenType.GREATER:
+            return left_val > right_val
+
+        elif node.operator == AxiomTokenType.LESS_EQUAL:
+            return left_val <= right_val
+
+        elif node.operator == AxiomTokenType.GREATER_EQUAL:
+            return left_val >= right_val
+
+        else:
+            self.error.raise_error(f"Unknown binary operator: {node.operator}", func='visit_BinaryOp')
+
 
 
         # Вспомогательные функции для проверки типов
@@ -148,7 +206,7 @@ class AxiomInterpreter: # класс интерпретатора
             self.error.raise_error(func='_check_numeric', message=f"Operator '{op}' requires numeric operands")
 
 
-    def _chek_numeric_or_string(self, left, right, op): # проверяет что оба операнда числа либо строки
+    def _check_numeric_or_string(self, left, right, op): # проверяет что оба операнда числа либо строки
         if isinstance(left, (int, float)) and isinstance(right, (int, float)):
             return
 
@@ -171,16 +229,15 @@ class AxiomInterpreter: # класс интерпретатора
 
 
 if __name__ == '__main__':
-    # Программа: var x = 5; x = x + 2;
-    # Создаём узлы
+
     var_decl = VarDeclaration(AxiomTokenType.VAR, 'x', Literal(5))
-    # x + 2
+    print(var_decl)
     add_op = BinaryOp(Identifier('x'), AxiomTokenType.PLUS, Literal(2))
-    # присваивание x = x + 2
+    print(add_op)
     assign = BinaryOp(Identifier('x'), AxiomTokenType.ASSIGN, add_op)
-    # оборачиваем присваивание в ExpressionStmt (так как это инструкция-выражение)
+    print(assign)
+
     assign_stmt = ExpressionStmt(assign)
-    # программа из двух инструкций
     program = [var_decl, assign_stmt]
 
     # Интерпретируем

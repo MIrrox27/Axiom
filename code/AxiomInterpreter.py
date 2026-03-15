@@ -36,7 +36,7 @@ class AxiomEnvironment: #
         if self.parent is not None:
             return self.parent.get(name)
         # raise Exception(f"Variable '{name}' is not defined")
-        self.env_error(message=f"Variable '{name}' is not defined", func='set')
+        self.env_error(message=f"Variable '{name}' is not defined", func='get')
 
 
     def set(self, name, value): # Изменение значения переменной, не работает с необъявленными переменными
@@ -87,12 +87,12 @@ class AxiomInterpreter: # класс интерпретатора
             print(output)
             return None
 
-        self.global_env.define('print', CallExpr('print', -1, print_func())) # регистрируем функцию
+        self.global_env.define('print', Callable('print', -1, print_func)) # регистрируем функцию
 
         def input_func(prompt=""): # принимает только 1 значение
             return input(str(prompt))
 
-        self.global_env.define('input', CallExpr('input', 1, input_func())) # регистрируем функцию
+        self.global_env.define('input', Callable('input', 1, input_func)) # регистрируем функцию
 
         # тут будут все остальные функции
 
@@ -110,8 +110,6 @@ class AxiomInterpreter: # класс интерпретатора
             args.append(arg_value)
 
         return callee.call(args)
-
-
 
 
 
@@ -204,7 +202,7 @@ class AxiomInterpreter: # класс интерпретатора
             return left_val + right_val
 
         elif node.operator == AxiomTokenType.MINUS:
-            self._check_numeric(right_val, left_val, node.operator)
+            self._check_numeric(left_val, right_val, node.operator)
             return left_val - right_val
 
         elif node.operator == AxiomTokenType.MULTIPLY:
@@ -253,20 +251,33 @@ class AxiomInterpreter: # класс интерпретатора
             self.error.raise_error(f"Unknown binary operator: {node.operator}", func='visit_BinaryOp')
 
 
+    def visit_UnaryOp(self, node):
+        if node.operator == AxiomTokenType.NOT:
+            val = self.visit(node.expr)
+            return not self.is_truthy(val)
+
+        else:
+            self.error.raise_error(f"Unknown unary operator: {node.operator}", 'visit_UnaryOp')
+
 
         # проверка операторов
-    def visit_IfStmt(self, node): # Обработка if
+
+    def visit_IFStmt(self, node):
+        # Вычисляем условие if
         if self.is_truthy(self.visit(node.condition)):
             self.visit(node.than_branch)
             return None
 
+        # Проверяем все elif
         for elif_clause in node.elif_branches:
             if self.is_truthy(self.visit(elif_clause.condition)):
                 self.visit(elif_clause.block)
                 return None
 
+        # Если ничего не сработало и есть else
         if node.else_branch is not None:
             self.visit(node.else_branch)
+        return None
 
 
 
@@ -282,8 +293,8 @@ class AxiomInterpreter: # класс интерпретатора
 
 
     def visit_ForStmt(self, node):
-        previos_env = self.env # создаем новое окружение
-        self.env = AxiomEnvironment(previos_env)
+        previous_env = self.env # создаем новое окружение
+        self.env = AxiomEnvironment(previous_env)
 
         try:
             if node.initializer is not None:
@@ -302,7 +313,7 @@ class AxiomInterpreter: # класс интерпретатора
                     self.visit(node.increment)
 
         finally:
-            self.env = previos_env
+            self.env = previous_env
 
         return None
 
@@ -380,7 +391,7 @@ class AxiomInterpreter: # класс интерпретатора
         if isinstance(left, (int, float)) and isinstance(right, (int, float)):
             return
 
-        if isinstance(left, str) and isinstance(left, str):
+        if isinstance(left, str) and isinstance(right, str):
             return
 
         self.error.raise_error(func='_check_numeric', message=f'Operator {op} requires both numbers or both string')

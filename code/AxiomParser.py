@@ -16,6 +16,11 @@ class AxiomParser:
         self.loop_for = False
         self.ERROR = Error("AxiomParser")
 
+        self.builtin_functions = {
+            AxiomTokenType.PRINT: "print",
+            AxiomTokenType.INPUT: "input"
+        }
+
 
     def log(self, message):
         if self.debug:
@@ -64,6 +69,16 @@ class AxiomParser:
                 return self.parse_call(node)
 
             return node
+
+
+        elif token.type in self.builtin_functions:
+            self.eat(token.type)
+            node = Identifier(self.builtin_functions[token.type])
+
+            if self.current_token.type == AxiomTokenType.LPAREN:
+                return self.parse_call(node)
+            else:
+                self.error(f"Expected '(' after {token.type.name}", 'parse_primary')
 
 
         # символы (скобки)
@@ -219,7 +234,7 @@ class AxiomParser:
             self.eat(AxiomTokenType.ASSIGN)
 
             right = self.parse_assignment()
-            node = BinaryOp(left=node, operator=operator_token, right=right)
+            node = BinaryOp(left=node, operator=operator_token.type, right=right)
         return node
 
 
@@ -472,6 +487,7 @@ class AxiomParser:
         self.eat(AxiomTokenType.RPAREN)
 
         return CallExpr(callee, arguments)
+
 
 
 

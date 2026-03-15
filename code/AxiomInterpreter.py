@@ -21,7 +21,7 @@ class AxiomEnvironment: #
 
 
     def env_error(self, message, func):
-       self.error.error(message=message, func=func)
+       self.error.raise_error(message=message, func=func)
 
     def define(self, name, value): # определение новой переменной в текущем окружении или перезаписывает текущую
         self.variables[name] = value
@@ -34,7 +34,7 @@ class AxiomEnvironment: #
         if self.parent is not None:
             return self.parent.get(name)
         # raise Exception(f"Variable '{name}' is not defined")
-        self.env_error(message="Variable '{name}' is not defined", func='set')
+        self.env_error(message=f"Variable '{name}' is not defined", func='set')
 
 
     def set(self, name, value): # Изменение значения переменной, не работает с необъявленными переменными
@@ -210,6 +210,34 @@ class AxiomInterpreter: # класс интерпретатора
         return None
 
 
+    def visit_ForStmt(self, node):
+        previos_env = self.env # создаем новое окружение
+        self.env = AxiomEnvironment(previos_env)
+
+        try:
+            if node.initializer is not None:
+                self.visit(node.initializer)
+
+            while True:
+                if node.condition is not None:
+                    condition_value = self.visit(node.condition)
+
+                    if not self.is_truthy(condition_value):
+                        break
+
+                self.visit(node.body)
+
+                if node.increment is not None:
+                    self.visit(node.increment)
+
+        finally:
+            self.env = previos_env
+
+        return None
+
+
+
+
         # Вспомогательные функции для проверки типов
     def is_truthy(self, value): # смотрит, является ли значение истинным
         # в Axiom false, 0 и nill считаются ложными, все остальное истинными
@@ -258,23 +286,37 @@ class AxiomInterpreter: # класс интерпретатора
 
 if __name__ == '__main__':
 
-    var_decl = VarDeclaration(AxiomTokenType.VAR, 'x', Literal(5))
-    print(var_decl)
-    add_op = BinaryOp(Identifier('x'), AxiomTokenType.PLUS, Literal(2))
-    print(add_op)
-    assign = BinaryOp(Identifier('x'), AxiomTokenType.ASSIGN, add_op)
-    print(assign)
+    # Создаём узлы
+    # var x = 0
+    var_x = VarDeclaration(AxiomTokenType.VAR, 'x', Literal(0))
 
-    assign_stmt = ExpressionStmt(assign)
-    program = [var_decl, assign_stmt]
+    # for (var i = 0; i < 3; i = i + 1) { x = x + i; }
+    # инициализатор: var i = 0
+    init = VarDeclaration(AxiomTokenType.VAR, 'i', Literal(0))
+    # условие: i < 3
+    cond = BinaryOp(Identifier('i'), AxiomTokenType.LESS, Literal(3))
+    # инкремент: i = i + 1
+    inc = BinaryOp(Identifier('i'), AxiomTokenType.ASSIGN,
+                   BinaryOp(Identifier('i'), AxiomTokenType.PLUS, Literal(1)))
+    # тело: x = x + i (как выражение, но оно должно быть инструкцией-выражением)
+    body_expr = BinaryOp(Identifier('x'), AxiomTokenType.ASSIGN,
+                         BinaryOp(Identifier('x'), AxiomTokenType.PLUS, Identifier('i')))
+    body_stmt = ExpressionStmt(body_expr)
+    body_block = Block([body_stmt])
 
-    # Интерпретируем
+    # узел for
+    for_stmt = ForStmt(init, cond, inc, body_block)
+
+    # Программа
+    program = [var_x, for_stmt]
+
+    # Интерпретация
     interp = AxiomInterpreter()
     for stmt in program:
         interp.visit(stmt)
 
-    # Проверим значение x
-    print(interp.env.get('x'))  # должно быть 7
+    print(interp.env.get('x'))  # должно быть 3
+    print(interp.env.get('i'))  # ошибка: i не определена
 
 
 

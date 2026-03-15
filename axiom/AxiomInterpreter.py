@@ -1,8 +1,8 @@
 # author https://github.com/MIrrox27/Axiom
 # AxiomInterpreter.py
 
-from AxiomASTNodes import *
-from AxiomTokens import *
+from axiom.AxiomASTNodes import *
+from axiom.AxiomTokens import *
 
 class Error:
     def __init__(self, module):
@@ -25,30 +25,33 @@ class AxiomEnvironment: #
     def env_error(self, message, func):
        self.error.raise_error(message=message, func=func)
 
-    def define(self, name, value): # определение новой переменной в текущем окружении или перезаписывает текущую
-        self.variables[name] = value
+    def define(self, name, value, constant=False): # определение новой переменной в текущем окружении или перезаписывает текущую
+        self.variables[name] = {
+            'value': value,
+            'constant': constant
+        }
 
 
     def get(self, name): # возвращает значение переменной
         if name in self.variables:
-            return self.variables[name]
+            return self.variables[name]['value']
 
         if self.parent is not None:
             return self.parent.get(name)
-        # raise Exception(f"Variable '{name}' is not defined")
         self.env_error(message=f"Variable '{name}' is not defined", func='get')
 
 
     def set(self, name, value): # Изменение значения переменной, не работает с необъявленными переменными
         if name in self.variables:
-            self.variables[name] = value
+            if self.variables[name]['constant']:
+                self.error.raise_error(f"Cannot assign to constant '{name}' (declared with val)", 'set')
+            self.variables[name]['value'] = value
             return
+
         if self.parent is not None:
             self.parent.set(name, value)
             return
-
-        #raise Exception(f"Variable '{name}' is not defined")
-        self.env_error(message="Variable '{name}' is not defined", func='set')
+        self.error.raise_error(f"Variable '{name}' is not defined", 'set')
 
 
 
@@ -141,7 +144,9 @@ class AxiomInterpreter: # класс интерпретатора
         if node.value is not None:
             value = self.visit(node.value)
 
-        self.env.define(node.name, value)
+        is_const = (node.keyword == AxiomTokenType.VAL)
+
+        self.env.define(node.name, value, is_const)
         return None
 
 

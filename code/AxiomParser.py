@@ -38,6 +38,8 @@ class AxiomParser:
     def parse_primary(self):  # Парсит первичные выражения. Возвращает узел AST
         token = self.current_token
 
+
+        # типы данных
         if token.type in (AxiomTokenType.INTEGER, AxiomTokenType.FLOAT): #
             self.eat(token.type)
             return Literal(token.value)
@@ -56,9 +58,15 @@ class AxiomParser:
 
         elif token.type == AxiomTokenType.IDENTIFIER:
             self.eat(token.type)
-            return Identifier(token.value)
+            node = Identifier(token.value)
+
+            if self.current_token.type == AxiomTokenType.LPAREN:
+                return self.parse_call(node)
+
+            return node
 
 
+        # символы (скобки)
         elif token.type == AxiomTokenType.LPAREN:
             self.eat(AxiomTokenType.LPAREN) #
             node = self.parse_expression()  # Рекурсивно парсим выражение внутри
@@ -374,7 +382,6 @@ class AxiomParser:
             return self.error("Where is '(' after 'for'?", func)
 
 
-
     def parse_foreach_statement(self):
         func = 'parse_foreach_statement'
         self.eat(AxiomTokenType.FOREACH)
@@ -439,6 +446,32 @@ class AxiomParser:
             if self.current_token.type == AxiomTokenType.SEMICOLON:
                 self.eat(AxiomTokenType.SEMICOLON)
             return ExpressionStmt(expr)
+
+
+
+    def parse_call(self, callee): # парсинг вызова функций
+        self.eat(AxiomTokenType.LPAREN)
+
+        arguments = []
+
+        if self.current_token.type != AxiomTokenType.RPAREN:
+            while True:
+                arg = self.parse_expression() # парсим выражение (аргумент)
+                arguments.append(arg)
+
+                if self.current_token.type == AxiomTokenType.COMMA: # если запятая (после аргумента), то продолжаем
+                    self.eat(AxiomTokenType.COMMA)
+                    continue
+
+                elif self.current_token.type == AxiomTokenType.RPAREN:
+                    break
+
+                else:
+                    self.error(message="Expected ',' or ')' after argument", func='parse_call')
+
+        self.eat(AxiomTokenType.RPAREN)
+
+        return CallExpr(callee, arguments)
 
 
 

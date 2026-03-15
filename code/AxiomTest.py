@@ -5,8 +5,9 @@ from AxiomLexer import AxiomLexer
 from AxiomTokens import AxiomTokenType
 from AxiomASTNodes import *
 from AxiomParser import AxiomParser
+from AxiomInterpreter import *
 
-class Test:
+class Tests:
     def __init__(self):
         self.test_code = '''
         # Объявление переменных
@@ -430,14 +431,226 @@ class Test:
         print("\n[V] Все тесты парсера успешно пройдены!")
 
 
+
+
+
+
+
+class TestInterpreter(AxiomInterpreter):
+    # интерпретатор с захватом вывода print для тестирования
+
+    def __init__(self):
+        super().__init__()
+        self.output = []
+        # Переопределяем print, чтобы он добавлял строки в output
+        self._original_print = self.global_env.get('print')
+        self.global_env.define('print', Callable('print', -1, self._test_print))
+
+    def _test_print(self, *args):
+        output = ' '.join(str(arg) for arg in args)
+        self.output.append(output)
+        return None
+
+
+def run_test(code, expected_output=None, expected_error=None):
+    # Запускает код и возвращает вывод или ошибку
+    lexer = AxiomLexer(code)
+    parser = AxiomParser(lexer)
+    interpreter = TestInterpreter()
+
+    # Парсим программу
+    statements = []
+    try:
+        while parser.current_token.type != AxiomTokenType.EOF:
+            stmt = parser.parse_statement()
+            statements.append(stmt)
+    except Exception as e:
+        if expected_error:
+            assert str(e).startswith(expected_error), f"Expected error '{expected_error}', got '{e}'"
+            return
+        else:
+            raise
+
+    # Выполняем
+    try:
+        for stmt in statements:
+            interpreter.visit(stmt)
+    except Exception as e:
+        if expected_error:
+            assert str(e).startswith(expected_error), f"Expected error '{expected_error}', got '{e}'"
+            return
+        else:
+            raise
+
+    if expected_output is not None:
+        assert interpreter.output == expected_output, f"Expected output {expected_output}, got {interpreter.output}"
+
+    # Возвращаем интерпретатор для дополнительных проверок (например, значений переменных)
+    return interpreter
+
+
+        # Общие тесты интерпретатора
+
+def test_arithmetic():
+    code = """
+    var x = 5 + 3 * 2;
+    print(x);
+    """
+    run_test(code, ["11"])
+
+
+def test_comparison():
+    code = """
+    var a = 5 > 3;
+    var b = 5 == 5;
+    var c = 5 != 3;
+    print(a, b, c);
+    """
+    run_test(code, ["True True True"])
+
+
+def test_logical():
+    code = """
+    var t = true;
+    var f = false;
+    print(t and f);
+    print(t or f);
+    print(not t);
+    """
+    run_test(code, ["False", "True", "False"])
+
+
+def test_variables():
+    code = """
+    var x = 10;
+    var y = 20;
+    x = x + y;
+    print(x);
+    """
+    run_test(code, ["30"])
+
+
+def test_if():
+    code = """
+    var x = 5;
+    if x > 3 {
+        print("big");
+    } else {
+        print("small");
+    }
+    """
+    run_test(code, ["big"])
+
+
+def test_if_elif_else():
+    code = """
+    var x = 5;
+    if x > 10 {
+        print(">10");
+    } elif x > 3 {
+        print(">3");
+    } else {
+        print("<=3");
+    }
+    """
+    run_test(code, [">3"])
+
+
+def test_while():
+    code = """
+    var i = 0;
+    while (i < 3) {
+        print(i);
+        i = i + 1;
+    }
+    """
+    run_test(code, ["0", "1", "2"])
+
+
+def test_for():
+    code = """
+    var sum = 0;
+    for (var i = 0; i < 3; i = i + 1) {
+        sum = sum + i;
+    }
+    print(sum);
+    """
+    run_test(code, ["3"])
+
+
+def test_do():
+    code = """
+    var i = 5;
+    do (i < 3) {
+        print(i);
+        i = i + 1;
+    }
+    """
+    run_test(code, ["5"])
+
+
+def test_nested_blocks():
+    code = """
+    var x = 1;
+    {
+        var x = 2;
+        print(x);
+    }
+    print(x);
+    """
+    run_test(code, ["2", "1"])
+
+
+def test_function_call():
+    code = """
+    print("Hello", "world!");
+    """
+    run_test(code, ["Hello world!"])
+
+
+def test_division_by_zero():
+    code = """
+    var x = 5 / 0;
+    """
+    run_test(code, expected_error="[AxiomInterpreter]: [visit_BinaryOp] Division by zero")
+
+
+def test_undefined_variable():
+    code = """
+    print(y);
+    """
+    run_test(code, expected_error="[AxiomEnvironment]: [get] Variable 'y' is not defined")
+
+
+def _test_all():
+    test_arithmetic()
+    test_comparison()
+    test_logical()
+    test_variables()
+    test_if()
+    test_if_elif_else()
+    test_while()
+    test_for()
+    test_do()
+    test_nested_blocks()
+    test_function_call()
+    test_division_by_zero()
+    test_undefined_variable()
+    print("Все тесты пройдены успешно!")
+
+
 # Запуск теста
 if __name__ == "__main__":
 
-    test = Test()
-    #test.test_lexer_complete()
-    #test.test_lexer_edge_cases()
-    #test.test_AST()
+    test = Tests()
+    test.test_lexer_complete()
+    test.test_lexer_edge_cases()
+    test.test_AST()
     test.test_parser()
-    #test.test_if_parsing()
-    #test.test_parser_loops()
-    #test.test_parser_full()
+    test.test_if_parsing()
+    test.test_parser_loops()
+    test.test_parser_full()
+
+    _test_all()
+
+

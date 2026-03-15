@@ -72,11 +72,29 @@ class Callable: # базовый класс для всех функций
 
 
 
-
 class AxiomInterpreter: # класс интерпретатора
     def __init__(self):
         self.error = Error(module='AxiomEnvironment')
-        self.env = AxiomEnvironment() # класс с глобальным окружением
+        self.global_env = AxiomEnvironment() # глобальное окружение
+        self.env = self.global_env
+
+        self._register_builtins() # регистрируем все функции
+
+    def _register_builtins(self):
+
+        def print_func(*args):  # print выводит значения через пробел
+            output = ' '.join(str(arg) for arg in args)
+            print(output)
+            return None
+
+        self.global_env.define('print', CallExpr('print', -1, print_func())) # регистрируем функцию
+
+        def input_func(prompt=""): # принимает только 1 значение
+            return input(str(prompt))
+
+        self.global_env.define('input', CallExpr('input', 1, input_func())) # регистрируем функцию
+
+        # тут будут все остальные функции
 
 
 

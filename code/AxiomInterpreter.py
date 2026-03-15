@@ -236,6 +236,19 @@ class AxiomInterpreter: # класс интерпретатора
         return None
 
 
+    def visit_DoStmt(self, node):
+        while True:
+            self.visit(node.body)
+
+            condition_value = self.visit(node.condition)
+            if not self.is_truthy(condition_value):
+                break
+
+        return None
+
+
+
+
 
 
         # Вспомогательные функции для проверки типов

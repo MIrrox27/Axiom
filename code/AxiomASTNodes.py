@@ -3,12 +3,15 @@
 
 from AxiomTokens import AxiomTokenType
 
+
+
 class Error:
     def __init__(self, module):
         self.module = module
 
     def error(self, message, func):
         raise Exception(f'[{self.module}]: [{func}] {message}')
+
 
 
 class ASTNode:
@@ -22,14 +25,17 @@ class ASTNode:
             return visitor_method(self)
 
 
+
 class Statement(ASTNode):
     # Инструкция - действие, которое выполняется
     pass
 
 
+
 class Expression(ASTNode):
     # Выражение - что-то, что вычисляется в значение
     pass
+
 
 
 class Program(ASTNode):
@@ -46,10 +52,12 @@ class Literal(Expression):
         self.value = value
 
 
+
 class Identifier(Expression):
     # Идентификатор - имя переменной
     def __init__(self, name):
         self.name = name
+
 
 
 class BinaryOp(Expression):
@@ -58,6 +66,8 @@ class BinaryOp(Expression):
         self. left = left
         self.operator = operator
         self.right = right
+
+
 
 class UnaryOp(Expression): # класс для обработки унарных выражений
     def __init__(self, operator, expr):
@@ -73,9 +83,11 @@ class Statement(ASTNode):
 
 
 
+
 class ExpressionStmt(Statement): # инструкция выражения
     def __init__(self, expression):
         self.expression = expression
+
 
 
 class VarDeclaration(Statement): # объявление переменных и констант
@@ -84,6 +96,7 @@ class VarDeclaration(Statement): # объявление переменных и 
         self.keyword = keyword # слово которым я объявляю переменную (var/val)
         self.name = name # имя переменной
         self.value = value # значение переменной
+
 
 
 
@@ -126,6 +139,7 @@ class ListNode(Statement): # список val/var: literal __name__ [length] = [
         self.length = length
 
 
+
 class DictNode(Statement): # словарь
     """
             В планах осуществить несколько вариантов объявления словаря:
@@ -165,9 +179,12 @@ class DictNode(Statement): # словарь
         self.value = value
         self.length = length
 
+
+
 class IndexAccess(Statement): # Класс для обращения по индексу
     def __init__(self, index):
         self.index = index
+
 
 
 class Block(Statement): # блок кода
@@ -175,8 +192,10 @@ class Block(Statement): # блок кода
         self.statements = statements
 
 
+
 class EmtpyStmt(Statement): # пустая инструкция
     pass
+
 
 
 class IFStmt(Statement):  # узел AST для оператора IF
@@ -185,6 +204,7 @@ class IFStmt(Statement):  # узел AST для оператора IF
         self.than_branch = than_branch # сам блок if
         self.elif_branches = elif_branches if elif_branches else [] # список блоков elif (может быть равен 0)
         self.else_branch = else_branch # блок else (может отсутствовать)
+
 
 
 class ElifClause:  # вспомогательный класс для ветки elif
@@ -197,10 +217,12 @@ class ElifClause:  # вспомогательный класс для ветки
 
 
 
+
 class WhileStmt(Statement): # обычный цикл while
     def __init__(self, condition, body):
         self.condition = condition # условие при котором цикл выполняется
         self.body = body # тело цикла
+
 
 
 class DoStmt(Statement):
@@ -217,6 +239,7 @@ class DoStmt(Statement):
         self.condition = condition
 
 
+
 class ForStmt(Statement): # обычный цикл for
     def __init__(self, initializer, condition, increment, body):
         self.initializer = initializer # то что выполняется 1 раз при инициализации (допустим создание переменной)
@@ -225,11 +248,30 @@ class ForStmt(Statement): # обычный цикл for
         self.body = body # тело цикла
 
 
+
 class ForeachStmt(Statement): # цикл для перебора
     def __init__(self, variable, iterable, body):
         self.variable = variable # переменная, которая превращается в каждый элемент
         self.iterable = iterable # список, массив и т.п
         self.body = body # тело цикла
+
+
+
+
+class CallExpr(Expression): # класс встроенных функций
+    def __init__(self, callee, arguments):
+        self.callee = callee
+        self.arguments = arguments
+
+
+    def __repr__(self):
+        return f"CallExpr({self.callee.name}, {self.arguments})"
+
+
+
+
+
+
 
 
 

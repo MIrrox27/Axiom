@@ -258,7 +258,7 @@ class ForeachStmt(Statement): # цикл для перебора
 
 
 
-class CallExpr(Expression): # класс встроенных функций
+class CallExpr(Expression): # AST класс встроенных функций
     def __init__(self, callee, arguments):
         self.callee = callee
         self.arguments = arguments

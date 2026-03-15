@@ -13,6 +13,8 @@ class Error:
         raise Exception(f'[{self.module}]: [{func}] {message}')
 
 
+
+
 class AxiomEnvironment: #
     def __init__(self, parent=None):
         self.variables = {}
@@ -49,10 +51,31 @@ class AxiomEnvironment: #
         self.env_error(message="Variable '{name}' is not defined", func='set')
 
 
+
+
+class Callable: # базовый класс для всех функций
+    def __init__(self, name, arity, func):
+        self.name = name
+        self.arity = arity
+        self.func = func
+        self.error = Error('Callable')
+
+    def call(self, args): # вызов функции с переданными аргументами
+        if self.arity != -1 and len(args) != self.arity: # ошибка если функция не помечена как принимающая любое число аргументов и число аргументов не равно нужному
+            self.error.raise_error(f"Function '{self.name}' expects {self.arity} arguments, got {len(args)}", func='call')
+
+        return self.func(*args)
+
+
+
+
+
+
 class AxiomInterpreter: # класс интерпретатора
     def __init__(self):
         self.error = Error(module='AxiomEnvironment')
         self.env = AxiomEnvironment() # класс с глобальным окружением
+
 
 
     def visit(self, node): # основной метод создания
@@ -61,17 +84,21 @@ class AxiomInterpreter: # класс интерпретатора
         return method(node)
 
 
+
     def visit_error(self, node): # метод ошибки
         self.error.raise_error(func='visit_error', message=f'No visit method for {type(node).__name__}')
         #raise Exception(f'No visit method for {type(node).__name__}')
+
 
 
     def visit_Literal(self, node): #
         return node.value
 
 
+
     def visit_Identifier(self, node): #
         return self.env.get(node.name)
+
 
 
     def visit_VarDeclaration(self, node):
@@ -81,6 +108,7 @@ class AxiomInterpreter: # класс интерпретатора
 
         self.env.define(node.name, value)
         return None
+
 
 
     def visit_Block(self, node):
@@ -97,9 +125,11 @@ class AxiomInterpreter: # класс интерпретатора
         return None
 
 
+
     def visit_ExpressionStmt(self, node): # временно делаем
         self.visit(node.expression) # Вычисляем выражение, результат отбрасываем
         return None
+
 
 
     def visit_BinaryOp(self, node): # выполняет бинарную операцию
@@ -186,6 +216,7 @@ class AxiomInterpreter: # класс интерпретатора
             self.error.raise_error(f"Unknown binary operator: {node.operator}", func='visit_BinaryOp')
 
 
+
         # проверка операторов
     def visit_IfStmt(self, node): # Обработка if
         if self.is_truthy(self.visit(node.condition)):
@@ -201,6 +232,7 @@ class AxiomInterpreter: # класс интерпретатора
             self.visit(node.else_branch)
 
 
+
     def visit_WhileStmt(self, node): # обработка while
         while True:  # пока условие верное, выполняем действия
             condition_value = self.visit(node.condition) # если условие ложное - выходим
@@ -209,6 +241,7 @@ class AxiomInterpreter: # класс интерпретатора
             self.visit(node.body)
 
         return None
+
 
 
     def visit_ForStmt(self, node):
@@ -237,6 +270,7 @@ class AxiomInterpreter: # класс интерпретатора
         return None
 
 
+
     def visit_DoStmt(self, node):
         while True:
             self.visit(node.body)
@@ -246,6 +280,7 @@ class AxiomInterpreter: # класс интерпретатора
                 break
 
         return None
+
 
 
     def visit_ForeachStmt(self, node):
@@ -273,6 +308,7 @@ class AxiomInterpreter: # класс интерпретатора
         finally:
             self.env = previous_env # если была ошибка, то окружение восстановится
 
+        return None
 
 
 
@@ -296,9 +332,11 @@ class AxiomInterpreter: # класс интерпретатора
         return True
 
 
+
     def _check_numeric(self, left, right, op): # проверяет что оба операнда числа
         if not isinstance(left, (int, float)) or not isinstance(right, (int, float)):
             self.error.raise_error(func='_check_numeric', message=f"Operator '{op}' requires numeric operands")
+
 
 
     def _check_numeric_or_string(self, left, right, op): # проверяет что оба операнда числа либо строки
@@ -309,6 +347,7 @@ class AxiomInterpreter: # класс интерпретатора
             return
 
         self.error.raise_error(func='_check_numeric', message=f'Operator {op} requires both numbers or both string')
+
 
 
     def _check_comparable(self, left, right, op): # проверяет что операнды можно сравнивать

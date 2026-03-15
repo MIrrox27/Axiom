@@ -1,6 +1,6 @@
 # author https://github.com/MIrrox27/Axiom
 # AxiomParser.py
-from typing import Self
+
 
 from AxiomASTNodes import *
 from AxiomLexer import AxiomLexer

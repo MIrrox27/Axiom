@@ -186,6 +186,7 @@ class AxiomInterpreter: # класс интерпретатора
             self.error.raise_error(f"Unknown binary operator: {node.operator}", func='visit_BinaryOp')
 
 
+        # проверка операторов
     def visit_IfStmt(self, node): # Обработка if
         if self.is_truthy(self.visit(node.condition)):
             self.visit(node.than_branch)
@@ -247,6 +248,30 @@ class AxiomInterpreter: # класс интерпретатора
         return None
 
 
+    def visit_ForeachStmt(self, node):
+
+        iterable = self.visit(node.iterable)
+
+        if isinstance(iterable, str): # пока только работа со строками
+            items = iterable
+
+        else:
+            self.error.raise_error( f"foreach: unsupported iterable type {type(iterable).__name__}", func='visit_ForeachStmt')
+
+        previous_env = self.env # сохраняем текущее окружение
+        try:
+            for item in items:
+                self.env = AxiomEnvironment(previous_env) # создаем новое окружение
+
+                var_name = node.variable.name
+                self.env.define(var_name, item)
+
+                self.visit(node.body) # выполняем тело цикла
+
+                self.env = previous_env # восстанавливаем окружение
+
+        finally:
+            self.env = previous_env # если была ошибка, то окружение восстановится
 
 
 

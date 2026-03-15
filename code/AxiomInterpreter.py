@@ -66,6 +66,8 @@ class Callable: # базовый класс для всех функций
 
         return self.func(*args)
 
+    def __repr__(self):
+        return f"<built-in function {self.name}>"
 
 
 

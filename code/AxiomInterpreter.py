@@ -74,7 +74,7 @@ class Callable: # базовый класс для всех функций
 
 class AxiomInterpreter: # класс интерпретатора
     def __init__(self):
-        self.error = Error(module='AxiomEnvironment')
+        self.error = Error(module='AxiomInterpreter')
         self.global_env = AxiomEnvironment() # глобальное окружение
         self.env = self.global_env
 
@@ -95,6 +95,23 @@ class AxiomInterpreter: # класс интерпретатора
         self.global_env.define('input', CallExpr('input', 1, input_func())) # регистрируем функцию
 
         # тут будут все остальные функции
+
+
+
+    def visit_CallExpr(self, node): # выполняет вызов функции
+        callee = self.visit(node.callee)
+
+        if not isinstance(callee, Callable): # проверяем что это функция
+            self.error.raise_error(f"'{node.callee.name}' is not a function", func='visit_CallExpr')
+
+        args = []
+        for arg_node in node.arguments:
+            arg_value = self.visit(arg_node)
+            args.append(arg_value)
+
+        return callee.call(args)
+
+
 
 
 

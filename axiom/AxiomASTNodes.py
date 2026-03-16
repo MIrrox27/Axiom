@@ -1,7 +1,7 @@
 # author https://github.com/MIrrox27/Axiom
 # AxiomASTNodes.py
 
-from AxiomTokens import AxiomTokenType
+from axiom.AxiomTokens import AxiomTokenType
 
 
 

@@ -2,9 +2,9 @@
 # AxiomParser.py
 
 
-from AxiomASTNodes import *
-from AxiomLexer import AxiomLexer
-from  AxiomTokens import AxiomTokenType
+from axiom.AxiomASTNodes import *
+from axiom.AxiomLexer import AxiomLexer
+from  axiom.AxiomTokens import AxiomTokenType
 
 
 class AxiomParser:

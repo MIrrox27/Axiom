@@ -33,7 +33,7 @@ class AxiomTokenType(Enum):
     FOREACH = "FOREACH" # Цикл foreach: foreach(variable in collection)
     PRINT = 'PRINT'  # Вывод на печать: print(value)
     INPUT = 'INPUT'
-    BLOCK = 'BLOCK' # Ключевое слово для обозначения исполнения блока кода на другом языке block __lang__{code}
+    BLOCK = 'BLOCK' # Ключевое слово для обозначения исполнения блока кода на другом языке block __lang__{axiom}
     PYTHON = 'PYTHON' # Ключевое слово для исполнения кода на питоне
     #AXIOM = "AXIOM" # Еще не придумал
     RETURN = 'RETURN' # Возврат значения: return

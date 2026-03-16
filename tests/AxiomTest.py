@@ -1,11 +1,11 @@
 # author https://github.com/MIrrox27/Axiom
 # AxiomTest.py
 
-from AxiomLexer import AxiomLexer
-from AxiomTokens import AxiomTokenType
-from AxiomASTNodes import *
-from AxiomParser import AxiomParser
-from AxiomInterpreter import *
+from axiom.AxiomLexer import AxiomLexer
+from axiom.AxiomTokens import *
+from axiom.AxiomASTNodes import *
+from axiom.AxiomParser import AxiomParser
+from axiom.AxiomInterpreter import *
 
 class Tests:
     def __init__(self):
@@ -522,8 +522,8 @@ def test_logical():
 
 def test_variables():
     code = """
-    var x = 10;
-    var y = 20;
+    val x = 10;
+    val x = 20;
     x = x + y;
     print(x);
     """

@@ -522,8 +522,8 @@ def test_logical():
 
 def test_variables():
     code = """
-    val x = 10;
-    val x = 20;
+    var x = 10;
+    var y = 20;
     x = x + y;
     print(x);
     """

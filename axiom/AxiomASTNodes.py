@@ -193,7 +193,7 @@ class Block(Statement): # блок кода
 
 
 
-class EmtpyStmt(Statement): # пустая инструкция
+class EmtpyStmt(Statement): # пустая инструкция (да я немного тупанул и неправильно назвал класс, сделал ошибку, в версии 0.1.1 все исправлю)
     pass
 
 

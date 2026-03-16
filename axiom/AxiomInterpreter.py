@@ -151,6 +151,10 @@ class AxiomInterpreter: # класс интерпретатора
 
 
 
+    def visit_EmtpyStmt(self, node):
+        return None
+
+
     def visit_Block(self, node):
         previous_env = self.env # создаем новое окружение для бока
         self.env = AxiomEnvironment(previous_env)

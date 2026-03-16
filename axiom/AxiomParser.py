@@ -5,6 +5,7 @@
 from axiom.AxiomASTNodes import *
 from axiom.AxiomLexer import AxiomLexer
 from  axiom.AxiomTokens import AxiomTokenType
+import sys
 
 
 class AxiomParser:
@@ -71,7 +72,7 @@ class AxiomParser:
             return node
 
 
-        elif token.type in self.builtin_functions:
+        elif token.type in self.builtin_functions: # встроенные функции
             self.eat(token.type)
             node = Identifier(self.builtin_functions[token.type])
 
@@ -431,6 +432,9 @@ class AxiomParser:
 
         if token.type == AxiomTokenType.SEMICOLON:
             self.eat(AxiomTokenType.SEMICOLON)
+            return EmtpyStmt
+
+        elif token.type == AxiomTokenType.EOF:
             return EmtpyStmt
 
         elif token.type == AxiomTokenType.LBRACE:

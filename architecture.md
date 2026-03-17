@@ -2,7 +2,8 @@
 <h1>Project architecture</h1>
 </div>
 
-```
+<div align="center" id="scheme">
+```text
 axiom-lang/
 │
 ├── axiom/                      
@@ -35,6 +36,5 @@ axiom-lang/
 │
 ├── setup.py                     
 └── README.md
-```                   
-
-
+```
+</div>

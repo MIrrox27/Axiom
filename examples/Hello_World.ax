@@ -1,0 +1,4 @@
+    # Первая программа на Axiom
+print("Hello, World!");
+
+

@@ -5,7 +5,7 @@
 from axiom.AxiomASTNodes import *
 from axiom.AxiomLexer import AxiomLexer
 from  axiom.AxiomTokens import AxiomTokenType
-import sys
+
 
 
 class AxiomParser:
@@ -54,7 +54,7 @@ class AxiomParser:
             self.eat(token.type)
             return Literal(token.value)
 
-        elif token.type == AxiomTokenType.NILL:
+        elif token.type == AxiomTokenType.NONE:
             self.eat(token.type)
             return Literal(None)
 

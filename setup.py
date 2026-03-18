@@ -20,10 +20,10 @@ setup(
     url="https://github.com/MIrrox27/Axiom",
 
     packages=find_packages(),
-    entry_points = {
-        "condole_scripts": [
-            "axiom = axiom.__main__:main"
-        ]
+    entry_points={
+        "console_scripts": [
+            "axiom = axiom.__main__:main",
+        ],
     },
 
     python_requires=">=3.8",

@@ -37,7 +37,7 @@ class AxiomLexer:
             'in': AxiomTokenType.IN,
             'and': AxiomTokenType.AND,
             'or': AxiomTokenType.OR,
-            'nill': AxiomTokenType.NILL,
+            'None': AxiomTokenType.NONE,
             'not': AxiomTokenType.NOT,
             'return': AxiomTokenType.RETURN
         }

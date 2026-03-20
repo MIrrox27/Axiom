@@ -6,3 +6,5 @@ axiom/__pycache__/
 build/
 dist/
 __pycache__/
+
+axiom.exe

@@ -4,7 +4,7 @@
   <p><strong>Простой скриптовый язык для автоматизации и конфигурации</strong></p>
   <p>
     <a href="https://github.com/MIrrox27/Axiom/blob/main/doc/01-getting-started.md">Doc</a> •
-    <a href="https://github.com/yourusername/axiom-lang/blob/main/examples/">Examples</a> •
+    <a href="https://github.com/MIrrox27/Axiom/blob/main/doc/07-exaples.md">Examples</a> •
     <a href="https://github.com/MIrrox27/Axiom/issues">Report a bug</a>
   </p>
   <p>

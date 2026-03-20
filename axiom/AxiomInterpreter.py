@@ -104,6 +104,11 @@ class AxiomInterpreter: # класс интерпретатора
 
         self.global_env.define('int', Callable('int', -1, int_func))
 
+        def str_func(*args):
+            output = ' '.join(str(arg) for arg in args)
+            return str(output)
+
+        self.global_env.define('str', Callable('str', -1, str_func))
         # тут будут все остальные функции
 
 

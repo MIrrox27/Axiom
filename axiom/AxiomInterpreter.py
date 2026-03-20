@@ -92,10 +92,17 @@ class AxiomInterpreter: # класс интерпретатора
 
         self.global_env.define('print', Callable('print', -1, print_func)) # регистрируем функцию
 
-        def input_func(prompt=""): # принимает только 1 значение
+        def input_func(prompt:str=""): # принимает только 1 значение
             return input(str(prompt))
 
         self.global_env.define('input', Callable('input', 1, input_func)) # регистрируем функцию
+
+
+        def int_func(*args):
+            output = ' '.join(str(arg) for arg in args)
+            return int(output)
+
+        self.global_env.define('int', Callable('int', -1, int_func))
 
         # тут будут все остальные функции
 

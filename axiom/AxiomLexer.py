@@ -26,8 +26,8 @@ class AxiomLexer:
             'var': AxiomTokenType.VAR,
             'val': AxiomTokenType.VAL,
             'print': AxiomTokenType.PRINT,
-            'true': AxiomTokenType.BOOL,
-            'false': AxiomTokenType.BOOL,
+            'True': AxiomTokenType.BOOL,
+            'False': AxiomTokenType.BOOL,
             'class': AxiomTokenType.CLASS,
             'import': AxiomTokenType.IMPORT,
             'enum': AxiomTokenType.ENUM,
@@ -314,7 +314,8 @@ class AxiomLexer:
 
                     # Для булевых значений возвращаем их значение
                     if token_type == AxiomTokenType.BOOL:
-                        return AxiomToken(token_type, identifier == 'true', self.line)
+                        bool_value = (identifier == 'True')
+                        return AxiomToken(token_type, bool_value, self.line)
                     return AxiomToken(token_type, identifier, self.line)
 
                 # Обычный идентификатор (если ничего не нашли возвращаем их название)

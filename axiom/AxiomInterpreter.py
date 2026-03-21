@@ -66,8 +66,8 @@ class Callable: # базовый класс для всех функций
     def call(self, args): # вызов функции с переданными аргументами
         if self.arity != -1 and len(args) != self.arity: # ошибка если функция не помечена как принимающая любое число аргументов и число аргументов не равно нужному
             self.error.raise_error(f"Function '{self.name}' expects {self.arity} arguments, got {len(args)}", func='call')
-
         return self.func(*args)
+
 
     def __repr__(self):
         return f"<built-in function {self.name}>"
@@ -92,7 +92,8 @@ class AxiomInterpreter: # класс интерпретатора
 
         self.global_env.define('print', Callable('print', -1, print_func)) # регистрируем функцию
 
-        def input_func(prompt:str=""): # принимает только 1 значение
+
+        def input_func(prompt=""): # принимает только 1 значение
             return input(str(prompt))
 
         self.global_env.define('input', Callable('input', 1, input_func)) # регистрируем функцию
@@ -109,6 +110,18 @@ class AxiomInterpreter: # класс интерпретатора
             return str(output)
 
         self.global_env.define('str', Callable('str', -1, str_func))
+
+
+        def is_int_func(example):
+            if example % 1 == 0:
+                return True
+
+            else:
+                return False
+
+
+
+        self.global_env.define('is_int', Callable('is_int', 1, is_int_func))
         # тут будут все остальные функции
 
 

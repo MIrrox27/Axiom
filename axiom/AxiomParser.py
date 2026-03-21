@@ -402,26 +402,34 @@ class AxiomParser:
         func = 'parse_foreach_statement'
         self.eat(AxiomTokenType.FOREACH)
 
-        if self.current_token.type == AxiomTokenType.VAR:
-            self.eat(AxiomTokenType.VAR)
+        if self.current_token.type == AxiomTokenType.LPAREN:
+            self.eat(AxiomTokenType.LPAREN)
 
-        elif self.current_token.type == AxiomTokenType.VAL:
-            self.error("you can't use 'val' in this loop", func)
+            if self.current_token.type == AxiomTokenType.VAR:
+                self.eat(AxiomTokenType.VAR)
+
+            elif self.current_token.type == AxiomTokenType.VAL:
+                self.error("you can't use 'val' in this loop", func)
 
 
-        if self.current_token.type != AxiomTokenType.IDENTIFIER:
-            self.error("After the loop a variable is expected", func)
+            if self.current_token.type != AxiomTokenType.IDENTIFIER:
+                self.error("After the loop a variable is expected", func)
 
-        var_name = self.current_token.value
-        self.eat(AxiomTokenType.IDENTIFIER)
+            var_name = self.current_token.value
+            self.eat(AxiomTokenType.IDENTIFIER)
 
-        if self.current_token.type != AxiomTokenType.IN:
-            self.error("After the variable expected 'in'", func)
-        self.eat(AxiomTokenType.IN)
+            if self.current_token.type != AxiomTokenType.IN:
+                self.error("After the variable expected 'in'", func)
+            self.eat(AxiomTokenType.IN)
+
+        else:
+            self.error(f'where is "(" ?', func)
 
         iterable = self.parse_expression()
+        self.eat(AxiomTokenType.RPAREN)
 
         body = self.parse_block()
+
 
         return ForeachStmt(Identifier(var_name), iterable=iterable, body=body)
 

@@ -89,39 +89,39 @@ class AxiomInterpreter: # класс интерпретатора
             output = ' '.join(str(arg) for arg in args)
             print(output)
             return None
-
         self.global_env.define('print', Callable('print', -1, print_func)) # регистрируем функцию
 
 
         def input_func(prompt=""): # принимает только 1 значение
             return input(str(prompt))
-
         self.global_env.define('input', Callable('input', 1, input_func)) # регистрируем функцию
 
 
         def int_func(*args):
             output = ' '.join(str(arg) for arg in args)
             return int(output)
-
         self.global_env.define('int', Callable('int', -1, int_func))
+
 
         def str_func(*args):
             output = ' '.join(str(arg) for arg in args)
             return str(output)
-
         self.global_env.define('str', Callable('str', -1, str_func))
 
 
-        def is_int_func(example):
-            if example % 1 == 0:
+        def is_int_func(expressions):
+            if expressions % 1 == 0:
                 return True
 
             else:
                 return False
-
-
-
         self.global_env.define('is_int', Callable('is_int', 1, is_int_func))
+
+
+        #def calculate(expressions):
+           # expressions = list(expressions)
+
+
         # тут будут все остальные функции
 
 

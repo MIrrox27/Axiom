@@ -325,7 +325,7 @@ class AxiomLexer:
 
 
 if __name__ == "__main__":
-    test_code = "not, var, val, name, nill, or, ||, !, and, &&, is, in, do (i > 1) {var x_name_1 = 1} x = "
+    test_code = "not, var, val, name, None, or, ||, !, and, &&, is, in, do (i > 1) {var x_name_1 = 1} x = "
     lexer = AxiomLexer(test_code)
     while True:
         token = lexer.get_next_token()

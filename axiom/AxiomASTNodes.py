@@ -268,6 +268,8 @@ class CallExpr(Expression): # AST класс встроенных функций
         return f"CallExpr({self.callee.name}, {self.arguments})"
 
 
+
+
 class ImportStmt(Statement):
     def __init__(self, module_name):
         self.module_name = module_name
@@ -276,6 +278,14 @@ class ImportStmt(Statement):
         return f"ImportStmt({self.module_name})"
 
 
+
+class MemberAccess(Expression):
+    def __init__(self, obj, member):
+        self.obj = obj
+        self.member = member
+
+    def __repr__(self):
+        return f"MemberAccess({self.obj}, {self.member})"
 
 
 

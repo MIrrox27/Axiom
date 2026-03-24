@@ -71,6 +71,7 @@ class AxiomTokenType(Enum):
     SEMICOLON = 'SEMICOLON'  # Точка с запятой: ;
     COLON = 'COLON' # Двоеточие: :
     COMMA = 'COMMA'  # Запятая: ,
+    DOT = 'DOT' # точка .
 
     # СПЕЦИАЛЬНЫЕ ТОКЕНЫ
     EOF = 'EOF'  # Конец файла (End Of File)

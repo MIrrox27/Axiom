@@ -101,8 +101,13 @@ class AxiomInterpreter: # класс интерпретатора
         self.error = Error(module='AxiomInterpreter')
         self.global_env = AxiomEnvironment() # глобальное окружение
         self.env = self.global_env
-        self._register_builtins() # регистрируем все функции
 
+        self._register_builtins() # регистрируем все функции
+        self.modules = {} # все модули
+
+
+
+            # --------ВСТРОЕННЫЕ ФУНКЦИИ--------
 
     def _register_builtins(self):
 
@@ -144,6 +149,35 @@ class AxiomInterpreter: # класс интерпретатора
 
 
         # тут будут все остальные функции
+
+
+
+
+            # --------МОДУЛИ--------
+
+    def _register_standard_modules(self):
+        math_module = Module('math')
+        self._register_math_functions(math_module)
+        self.modules['math'] = math_module
+
+
+    def _register_math_functions(self, module):
+        import math as py_math
+
+            # функции
+        def sqrt_func(x): #
+            return py_math.sqrt(x)
+        module.define('sqrt', Callable('math.sqrt', 1, sqrt_func))
+
+        def pow_func(x, y): # возведение в степень
+            return x ** y
+        module.define('pow', Callable('math.pow', 2, pow_func))
+
+            # константы
+        module.define('pi', py_math.pi)
+        module.define('e', py_math.e)
+
+
 
 
 

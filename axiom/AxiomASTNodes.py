@@ -268,7 +268,12 @@ class CallExpr(Expression): # AST класс встроенных функций
         return f"CallExpr({self.callee.name}, {self.arguments})"
 
 
+class ImportStmt(Statement):
+    def __init__(self, module_name):
+        self.module_name = module_name
 
+    def __repr__(self):
+        return f"ImportStmt({self.module_name})"
 
 
 

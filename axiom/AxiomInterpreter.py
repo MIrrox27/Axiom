@@ -178,7 +178,7 @@ class AxiomInterpreter: # класс интерпретатора
         module.define('e', py_math.e)
 
 
-    def visit_MemberAccess(self, node):
+    def visit_MemberAccess(self, node): # Вычисляет доступ к члену объекта
         obj = self.visit(node.obj)
 
         if not isinstance(obj, Module):
@@ -187,7 +187,16 @@ class AxiomInterpreter: # класс интерпретатора
         return obj.get(node.member)
 
 
+    def visit_ImportStmt(self, node): # Выполняет импорт модуля
 
+        module_name = node.module_name
+
+        if module_name not in self.modules:
+            self.error.raise_error(f"Module '{module_name}' not found", func="visit_ImportStmt")
+
+        module = self.modules[module_name]
+        self.env.define(module_name, module, constant=False)
+        return None
 
 
 

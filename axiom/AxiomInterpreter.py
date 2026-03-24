@@ -74,14 +74,35 @@ class Callable: # базовый класс для всех функций
 
 
 
+class Module:
+    def __init__(self, name):
+        self.name = name
+        self.exports = {}
+        self.error = Error(module="Module")
+
+
+    def define(self, name, value):
+        self.exports[name] = value
+
+
+    def get(self, name):
+        if name in self.exports:
+            return self.exports[name]
+        self.error.raise_error(f"Module '{self.name}' has no export '{name}'", func='get')
+
+    def __repr__(self):
+        return f"<module {self.name}>"
+
+
+
 
 class AxiomInterpreter: # класс интерпретатора
     def __init__(self):
         self.error = Error(module='AxiomInterpreter')
         self.global_env = AxiomEnvironment() # глобальное окружение
         self.env = self.global_env
-
         self._register_builtins() # регистрируем все функции
+
 
     def _register_builtins(self):
 

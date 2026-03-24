@@ -180,7 +180,6 @@ class AxiomInterpreter: # класс интерпретатора
 
 
 
-
     def visit_CallExpr(self, node): # выполняет вызов функции
         callee = self.visit(node.callee)
 

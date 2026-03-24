@@ -434,6 +434,20 @@ class AxiomParser:
         return ForeachStmt(Identifier(var_name), iterable=iterable, body=body)
 
 
+    def parse_import_statement(self): #
+
+        if self.current_token.type != AxiomTokenType.IDENTIFIER:
+            self.error("Expected module name after 'import'", func='parse_import_statement')
+
+        module_name = self.current_token.value
+        self.eat(AxiomTokenType.IDENTIFIER)
+
+        if self.current_token.type == AxiomTokenType.SEMICOLON:
+            self.eat(AxiomTokenType.SEMICOLON)
+
+        return ImportStmt(module_name)
+
+
 
     def parse_statement(self):
         token = self.current_token
@@ -444,6 +458,9 @@ class AxiomParser:
 
         elif token.type == AxiomTokenType.EOF:
             return EmtpyStmt
+
+        elif token.type == AxiomTokenType.IMPORT:
+            return self.parse_import_statement()
 
         elif token.type == AxiomTokenType.LBRACE:
             return self.parse_block() # функция, которая будет парсить блоки кода, у нас они находятся в {}

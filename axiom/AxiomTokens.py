@@ -21,7 +21,7 @@ class AxiomTokenType(Enum):
     SCRIPT = 'SCRIPT' # Объявление начала скрипта: script{} (для использования в линуксе)
     CLASS = 'CLASS'  # Объявление класса: class(наследование){}
     ENUM = 'ENUM'  # Объявление перечисления: enum{}
-    IMPORT = 'IMPORT'  # Импорт модулей: import <module>
+    IMPORT = 'IMPORT'  # Импорт модулей: import module
     VAR = 'VAR'  # Объявление изменяемой переменной var __name__ = value <- not const
     VAL = 'VAL' # Объявление неизменяемой переменной val __name__ = value <- const
     IF = 'IF'  # Условный оператор: if(parameters){}

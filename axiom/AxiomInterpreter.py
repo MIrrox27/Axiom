@@ -178,6 +178,17 @@ class AxiomInterpreter: # класс интерпретатора
         module.define('e', py_math.e)
 
 
+    def visit_MemberAccess(self, node):
+        obj = self.visit(node.obj)
+
+        if not isinstance(obj, Module):
+            self.error.raise_error(f"Cannot access member of non-module object: {obj}", 'visit_MemberAccess')
+
+        return obj.get(node.member)
+
+
+
+
 
 
     def visit_CallExpr(self, node): # выполняет вызов функции

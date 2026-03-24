@@ -23,6 +23,9 @@ class AxiomParser:
         }
 
 
+
+            # ----ФУНКЦИИ КЛАССА-----
+
     def log(self, message):
         if self.debug:
             print(f'[Parser DEBUG]: {message}, line: {self.lexer.line}, position: {self.lexer.position}, current char: "{self.lexer.current_char}"')
@@ -41,9 +44,11 @@ class AxiomParser:
             # token_type - токен, который нам нужен
 
 
+
+            # -----ВЫРАЖЕНИЯ-----
+
     def parse_primary(self):  # Парсит первичные выражения. Возвращает узел AST
         token = self.current_token
-
 
         # типы данных
         if token.type in (AxiomTokenType.INTEGER, AxiomTokenType.FLOAT): #
@@ -68,6 +73,10 @@ class AxiomParser:
 
             if self.current_token.type == AxiomTokenType.LPAREN:
                 return self.parse_call(node)
+
+            elif self.current_token.type == AxiomTokenType.DOT:
+                return self.parse_member_access(node)
+
 
             return node
 
@@ -105,6 +114,7 @@ class AxiomParser:
             self.error(f"Received {token.type}", func='parse_primary')
 
 
+
     def parse_unary(self): # обработка унарных операторов, пока только not, потом добавлю ++ и --
         token = self.current_token
 
@@ -133,6 +143,7 @@ class AxiomParser:
         return node
 
 
+
     def parse_mul_div_mod(self):
         node = self.parse_power()
          #
@@ -148,6 +159,7 @@ class AxiomParser:
                 right=right
             )
         return node
+
 
 
     def parse_add_sub(self): # парсит сложение и вычитание
@@ -175,6 +187,7 @@ class AxiomParser:
         return node
 
 
+
     def parse_comparison(self): # парсинг выражений равенства
         node = self.parse_add_sub()
 
@@ -200,6 +213,8 @@ class AxiomParser:
             )
         return node
 
+
+
     def parse_logical_and(self): # обработка логического and
         node = self.parse_comparison()
         while self.current_token.type == AxiomTokenType.AND:
@@ -209,6 +224,7 @@ class AxiomParser:
 
             node = BinaryOp(left=node, operator=op, right=right)
         return node
+
 
 
     def parse_logical_or(self): # обработка логического or
@@ -239,10 +255,12 @@ class AxiomParser:
         return node
 
 
+
     def parse_expression(self): # главный модуль, сделан для начала парсинга
         return self.parse_assignment()
 
 
+            # ----- БЛОК -----
 
     def parse_block(self):
         func = 'parse_block'
@@ -260,6 +278,9 @@ class AxiomParser:
         self.eat(AxiomTokenType.RBRACE)
         return Block(statements=statements)
 
+
+
+            # -----ПЕРЕМЕННЫЕ-----
 
     def parse_var_declaration(self, loop:bool = False): # парсит объявление переменной
         func = 'parse_var_declaration'
@@ -285,6 +306,9 @@ class AxiomParser:
 
         return  VarDeclaration(keyword_token.type, name=name, value=value)
 
+
+
+            # ----ПРОВЕРКИ-----
 
     def parse_if_statement(self): # парсинг if/elif/else
         self.eat(AxiomTokenType.IF) # съедаем if
@@ -325,6 +349,9 @@ class AxiomParser:
         )
 
 
+
+            # -----ЦИКЛЫ-----
+
     def parse_while_statement(self):
         func = 'parse_while_statement'
         self.eat(AxiomTokenType.WHILE)
@@ -340,6 +367,7 @@ class AxiomParser:
         return WhileStmt(condition=condition, body=body)
 
 
+
     def parse_do_statement(self):
         func = 'parse_do_statement'
         self.eat(AxiomTokenType.DO)
@@ -353,6 +381,7 @@ class AxiomParser:
 
         body = self.parse_block()
         return DoStmt(condition=condition, body=body)
+
 
 
     def parse_for_statement(self):
@@ -398,6 +427,7 @@ class AxiomParser:
             return self.error("Where is '(' after 'for'?", func)
 
 
+
     def parse_foreach_statement(self):
         func = 'parse_foreach_statement'
         self.eat(AxiomTokenType.FOREACH)
@@ -434,6 +464,8 @@ class AxiomParser:
         return ForeachStmt(Identifier(var_name), iterable=iterable, body=body)
 
 
+
+            # -----МОДУЛИ И ИХ ИМПОРТЫ-----
     def parse_import_statement(self): #
 
         if self.current_token.type != AxiomTokenType.IDENTIFIER:
@@ -446,6 +478,19 @@ class AxiomParser:
             self.eat(AxiomTokenType.SEMICOLON)
 
         return ImportStmt(module_name)
+
+
+    def parse_member_access(self, obj): # Парсит доступ к члену объекта
+        self.eat(AxiomTokenType.DOT)
+
+        if self.current_token.type != AxiomTokenType.IDENTIFIER:
+            self.error("Expected member name after '.'", func="parse_member_access")
+
+        member_name = self.current_token.value
+        self.eat(AxiomTokenType.IDENTIFIER)
+
+        return MemberAccess(obj, member_name)
+
 
 
 

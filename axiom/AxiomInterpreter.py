@@ -99,12 +99,14 @@ class Module:
 class AxiomInterpreter: # класс интерпретатора
     def __init__(self):
         self.error = Error(module='AxiomInterpreter')
+
         self.global_env = AxiomEnvironment() # глобальное окружение
         self.env = self.global_env
+
         self.modules = {}  # все модули
 
         self._register_builtins() # регистрируем все функции
-        self._register_standard_modules() # регистрируем все модули
+        self._register_standard_modules() # регистрируем стандартные модули
 
 
 
@@ -168,7 +170,7 @@ class AxiomInterpreter: # класс интерпретатора
             self.error.raise_error(f"Module '{module_name}' not found", func="visit_ImportStmt")
 
         module = self.modules[module_name]
-        self.env.define(module_name, module, constant=False)
+        self.global_env.define(module_name, module, constant=False)
         return None
 
 

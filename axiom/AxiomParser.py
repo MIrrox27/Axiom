@@ -465,7 +465,35 @@ class AxiomParser:
 
 
 
+            # -----ФУНКЦИИ-----
+
+    def parse_call(self, callee):  # парсинг вызова функций
+        self.eat(AxiomTokenType.LPAREN)
+
+        arguments = []
+
+        if self.current_token.type != AxiomTokenType.RPAREN:
+            while True:
+                arg = self.parse_expression()  # парсим выражение (аргумент)
+                arguments.append(arg)
+
+                if self.current_token.type == AxiomTokenType.COMMA:  # если запятая (после аргумента), то продолжаем
+                    self.eat(AxiomTokenType.COMMA)
+                    continue
+
+                elif self.current_token.type == AxiomTokenType.RPAREN:
+                    break
+
+                else:
+                    self.error(message="Expected ',' or ')' after argument", func='parse_call')
+
+        self.eat(AxiomTokenType.RPAREN)
+        return CallExpr(callee, arguments)
+
+
+
             # -----МОДУЛИ И ИХ ИМПОРТЫ-----
+
     def parse_import_statement(self): #
         self.eat(AxiomTokenType.IMPORT)
 
@@ -479,6 +507,7 @@ class AxiomParser:
             self.eat(AxiomTokenType.SEMICOLON)
 
         return ImportStmt(module_name)
+
 
 
     def parse_member_access(self, obj): # Парсит доступ к члену объекта
@@ -537,31 +566,6 @@ class AxiomParser:
                 self.eat(AxiomTokenType.SEMICOLON)
             return ExpressionStmt(expr)
 
-
-
-    def parse_call(self, callee): # парсинг вызова функций
-        self.eat(AxiomTokenType.LPAREN)
-
-        arguments = []
-
-        if self.current_token.type != AxiomTokenType.RPAREN:
-            while True:
-                arg = self.parse_expression() # парсим выражение (аргумент)
-                arguments.append(arg)
-
-                if self.current_token.type == AxiomTokenType.COMMA: # если запятая (после аргумента), то продолжаем
-                    self.eat(AxiomTokenType.COMMA)
-                    continue
-
-                elif self.current_token.type == AxiomTokenType.RPAREN:
-                    break
-
-                else:
-                    self.error(message="Expected ',' or ')' after argument", func='parse_call')
-
-        self.eat(AxiomTokenType.RPAREN)
-
-        return CallExpr(callee, arguments)
 
 
 

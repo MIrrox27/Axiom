@@ -467,9 +467,10 @@ class AxiomParser:
 
             # -----МОДУЛИ И ИХ ИМПОРТЫ-----
     def parse_import_statement(self): #
+        self.eat(AxiomTokenType.IMPORT)
 
         if self.current_token.type != AxiomTokenType.IDENTIFIER:
-            self.error("Expected module name after 'import'", func='parse_import_statement')
+            self.error(f"Expected module name '{self.current_token.type}' after 'import'", func='parse_import_statement')
 
         module_name = self.current_token.value
         self.eat(AxiomTokenType.IDENTIFIER)

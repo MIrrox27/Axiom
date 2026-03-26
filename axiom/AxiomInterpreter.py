@@ -101,9 +101,10 @@ class AxiomInterpreter: # класс интерпретатора
         self.error = Error(module='AxiomInterpreter')
         self.global_env = AxiomEnvironment() # глобальное окружение
         self.env = self.global_env
+        self.modules = {}  # все модули
 
         self._register_builtins() # регистрируем все функции
-        self.modules = {} # все модули
+        self._register_standard_modules() # регистрируем все модули
 
 
 
@@ -151,9 +152,28 @@ class AxiomInterpreter: # класс интерпретатора
         # тут будут все остальные функции
 
 
+    def visit_MemberAccess(self, node):  # Вычисляет доступ к члену объекта
+        obj = self.visit(node.obj)
+
+        if not isinstance(obj, Module):
+            self.error.raise_error(f"Cannot access member of non-module object: {obj}", 'visit_MemberAccess')
+
+        return obj.get(node.member)
+
+    def visit_ImportStmt(self, node):  # Выполняет импорт модуля
+
+        module_name = node.module_name
+
+        if module_name not in self.modules:
+            self.error.raise_error(f"Module '{module_name}' not found", func="visit_ImportStmt")
+
+        module = self.modules[module_name]
+        self.env.define(module_name, module, constant=False)
+        return None
 
 
-            # --------МОДУЛИ--------
+
+            # --------БИБЛИОТЕКИ (МОДУЛИ)--------
 
     def _register_standard_modules(self):
         math_module = Module('math')
@@ -178,25 +198,6 @@ class AxiomInterpreter: # класс интерпретатора
         module.define('e', py_math.e)
 
 
-    def visit_MemberAccess(self, node): # Вычисляет доступ к члену объекта
-        obj = self.visit(node.obj)
-
-        if not isinstance(obj, Module):
-            self.error.raise_error(f"Cannot access member of non-module object: {obj}", 'visit_MemberAccess')
-
-        return obj.get(node.member)
-
-
-    def visit_ImportStmt(self, node): # Выполняет импорт модуля
-
-        module_name = node.module_name
-
-        if module_name not in self.modules:
-            self.error.raise_error(f"Module '{module_name}' not found", func="visit_ImportStmt")
-
-        module = self.modules[module_name]
-        self.env.define(module_name, module, constant=False)
-        return None
 
 
 

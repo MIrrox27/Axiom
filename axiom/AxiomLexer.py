@@ -294,6 +294,10 @@ class AxiomLexer:
                 self.advance()
                 return AxiomToken(AxiomTokenType.COMMA, line=self.line)
 
+            if self.current_char == '.':
+                self.advance()
+                return AxiomToken(AxiomTokenType.DOT, line=self.line)
+
             if self.current_char == '"': #
                 token_type, value = self.read_string_double_quotes()
                 return AxiomToken(token_type, value, self.line)

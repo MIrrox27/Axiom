@@ -160,7 +160,7 @@ class AxiomInterpreter: # класс интерпретатора
         if not isinstance(obj, Module):
             self.error.raise_error(f"Cannot access member of non-module object: {obj}", 'visit_MemberAccess')
 
-        print(f"DEBUG: Accessing {node.obj}.{node.member}")
+        #print(f"DEBUG: Accessing {node.obj}.{node.member}")
         return obj.get(node.member)
 
 
@@ -173,8 +173,8 @@ class AxiomInterpreter: # класс интерпретатора
 
         module = self.modules[module_name]
 
-        print(f"DEBUG: Importing module {module_name}")
-        print(f"DEBUG: Module object: {module}")
+        #print(f"DEBUG: Importing module {module_name}")
+        #print(f"DEBUG: Module object: {module}")
 
         self.global_env.define(module_name, module, constant=False)
         return None

@@ -17,10 +17,7 @@ class AxiomParser:
         self.loop_for = False
         self.ERROR = Error("AxiomParser")
 
-        self.builtin_functions = {
-            AxiomTokenType.PRINT: "print",
-            AxiomTokenType.INPUT: "input"
-        }
+       # self.builtin_functions = { AxiomTokenType.PRINT: "print", AxiomTokenType.INPUT: "input" }
 
 
 
@@ -71,17 +68,16 @@ class AxiomParser:
             self.eat(token.type)
             node = Identifier(token.value)
 
-            if self.current_token.type == AxiomTokenType.LPAREN:
-                return self.parse_call(node)
-
-            elif self.current_token.type == AxiomTokenType.DOT:
+            if self.current_token.type == AxiomTokenType.DOT:
                 return self.parse_member_access(node)
 
+            elif self.current_token.type == AxiomTokenType.LPAREN:
+                return self.parse_call(node)
 
             return node
 
 
-        elif token.type in self.builtin_functions: # встроенные функции
+        #elif token.type in self.builtin_functions: # встроенные функции
             self.eat(token.type)
             node = Identifier(self.builtin_functions[token.type])
 
@@ -456,10 +452,8 @@ class AxiomParser:
             self.error(f'where is "(" ?', func)
 
         iterable = self.parse_expression()
-        self.eat(AxiomTokenType.RPAREN)
-
+        #self.eat(AxiomTokenType.RPAREN)
         body = self.parse_block()
-
 
         return ForeachStmt(Identifier(var_name), iterable=iterable, body=body)
 
@@ -519,8 +513,11 @@ class AxiomParser:
         member_name = self.current_token.value
         self.eat(AxiomTokenType.IDENTIFIER)
 
-        return MemberAccess(obj, member_name)
+        node = MemberAccess(obj, member_name)
+        if self.current_token.type == AxiomTokenType.LPAREN:
+            return self.parse_call(node)
 
+        return node
 
 
 

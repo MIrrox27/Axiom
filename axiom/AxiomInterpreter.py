@@ -160,16 +160,22 @@ class AxiomInterpreter: # класс интерпретатора
         if not isinstance(obj, Module):
             self.error.raise_error(f"Cannot access member of non-module object: {obj}", 'visit_MemberAccess')
 
+        print(f"DEBUG: Accessing {node.obj}.{node.member}")
         return obj.get(node.member)
 
-    def visit_ImportStmt(self, node):  # Выполняет импорт модуля
 
+
+    def visit_ImportStmt(self, node):  # Выполняет импорт модуля
         module_name = node.module_name
 
         if module_name not in self.modules:
             self.error.raise_error(f"Module '{module_name}' not found", func="visit_ImportStmt")
 
         module = self.modules[module_name]
+
+        print(f"DEBUG: Importing module {module_name}")
+        print(f"DEBUG: Module object: {module}")
+
         self.global_env.define(module_name, module, constant=False)
         return None
 
@@ -207,7 +213,23 @@ class AxiomInterpreter: # класс интерпретатора
         callee = self.visit(node.callee)
 
         if not isinstance(callee, Callable): # проверяем что это функция
-            self.error.raise_error(f"'{node.callee.name}' is not a function", func='visit_CallExpr')
+
+            if isinstance(node.callee, MemberAccess):
+
+                if isinstance(node.callee.obj):
+                    obj_name = node.callee.obj.name
+                else:
+                    obj_name = str(node.callee.obj)
+                callee_name = f"{obj_name}.{node.callee.member}"
+
+            elif isinstance(node.callee, Identifier):
+                callee_name = node.callee.name
+            else:
+                callee_name = str(node.callee)
+
+            self.error.raise_error(f"'{callee_name}' is not a function (got {type(callee).__name__})", func='visit_CallExpr')
+
+
 
         args = []
         for arg_node in node.arguments:

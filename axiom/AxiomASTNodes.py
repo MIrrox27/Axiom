@@ -265,8 +265,19 @@ class CallExpr(Expression): # AST класс встроенных функций
 
 
     def __repr__(self):
-        return f"CallExpr({self.callee.name}, {self.arguments})"
+        if isinstance(self.callee, Identifier):
+            callee_str = self.callee.name
+        elif isinstance(self.callee, MemberAccess):
+            # Для MemberAccess: math.sqrt
+            if isinstance(self.callee.obj, Identifier):
+                obj_name = self.callee.obj.name
+            else:
+                obj_name = str(self.callee.obj)
+            callee_str = f"{obj_name}.{self.callee.member}"
+        else:
+            callee_str = str(self.callee)
 
+        return f"CallExpr({callee_str}, {self.arguments})"
 
 
 

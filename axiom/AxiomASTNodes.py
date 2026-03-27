@@ -301,6 +301,28 @@ class MemberAccess(Expression):
 
 
 
+
+class FunDeclaration(Statement):
+    def __init(self, name, parameters, body):
+        self.name = name
+        self.parameters = parameters
+        self.body = body
+
+    def __repr__(self):
+        return f"FunDeclaration({self.name}, {self.parameters}, {self.body})"
+
+
+class ReturnStmt(Statement):
+    def __init__(self, value=None):
+        self.value = value
+
+    def __repr__(self):
+        return f"ReturnStmt({self.value})"
+
+
+
+
+
 # TEST
 if __name__ == "__main__":
     number_literal = Literal(42)

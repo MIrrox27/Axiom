@@ -25,7 +25,6 @@ class AxiomLexer:
             'foreach': AxiomTokenType.FOREACH,
             'var': AxiomTokenType.VAR,
             'val': AxiomTokenType.VAL,
-            'print': AxiomTokenType.PRINT,
             'True': AxiomTokenType.BOOL,
             'False': AxiomTokenType.BOOL,
             'class': AxiomTokenType.CLASS,

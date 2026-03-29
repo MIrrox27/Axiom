@@ -223,6 +223,16 @@ class AxiomInterpreter: # класс интерпретатора
 
 
 
+    def visit_ReturnStmt(self, node): # Выполняет оператор return.
+        value = None
+        if node.value is not None:
+            value = self.visit(node.value)
+
+        raise ReturnStmt(value) # Вычисляет значение и выбрасывает исключение ReturnValue.
+
+
+
+
             # --------БИБЛИОТЕКИ (МОДУЛИ)--------
 
     def _register_standard_modules(self):

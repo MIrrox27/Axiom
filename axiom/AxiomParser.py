@@ -617,6 +617,12 @@ class AxiomParser:
         elif token.type == AxiomTokenType.DO:
             return self.parse_do_statement()
 
+        elif token.type == AxiomTokenType.FUN:
+            return self.parse_fun_declaration()
+
+        elif token.type == AxiomTokenType.RETURN:
+            return self.parse_return_statement()
+
         # тут будут другие проверки действий
         else:
             expr = self.parse_expression()

@@ -521,6 +521,50 @@ class AxiomParser:
 
 
 
+            # -----ФУНКЦИИ-----
+
+    def parse_fun_declaration(self): # парсинг функции
+        func = "parse_fun_declaration"
+
+        self.eat(AxiomTokenType.FUN)
+
+        if self.current_token.type != AxiomTokenType.IDENTIFIER:
+            self.error("Expected function name after 'fun'", func)
+
+        name = self.current_token.value
+        self.eat(AxiomTokenType.IDENTIFIER)
+
+        if self.current_token.type != AxiomTokenType.LPAREN:
+            self.error("Expected '(' after function name", func)
+
+        self.eat(AxiomTokenType.LPAREN)
+
+        parameters = []
+        if self.current_token.type != AxiomTokenType.RPAREN:
+            while True:
+                if self.current_token.type != AxiomTokenType.IDENTIFIER:
+                    self.error("Expected parameter name", func)
+
+                param_name = self.current_token.value
+                self.eat(AxiomTokenType.IDENTIFIER)
+                parameters.append(param_name)
+
+                if self.current_token.type == AxiomTokenType.COMMA:
+                    self.eat(AxiomTokenType.COMMA)
+                    continue
+
+                elif self.current_token.type == AxiomTokenType.RPAREN:
+                    break
+
+                else:
+                    self.error("Expected ',' or ')' after parameter", func)
+
+
+        self.eat(AxiomTokenType.RPAREN)
+        body = self.parse_block()
+        return FunDeclaration(name=name, parameters=parameters, body=body)
+
+
     def parse_statement(self):
         token = self.current_token
 

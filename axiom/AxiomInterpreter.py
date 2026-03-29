@@ -233,9 +233,15 @@ class AxiomInterpreter: # класс интерпретатора
 
 
     def visit_FunDeclaration(self, node): # Создаёт пользовательскую функцию и сохраняет её в окружении.
-        func = UserFunction(node.name, node.parameters, node.body, self.env) # Создаём функцию, сохраняя текущее окружение
-        self.env.define(node.name, func, constant=False) # Сохраняем функцию в текущем окружении
+        func = UserFunction(
+            name=node.name,
+            parameters=node.parameters,
+            body=node.body,
+            closure_env=self.env,
+            interpreter=self
+        )
 
+        self.env.define(node.name, func, constant=False)
         return None
 
 

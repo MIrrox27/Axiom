@@ -138,6 +138,7 @@ class UserFunction(Callable):
 
 
 
+
 class AxiomInterpreter: # класс интерпретатора
     def __init__(self):
         self.error = Error(module='AxiomInterpreter')
@@ -606,45 +607,6 @@ class AxiomInterpreter: # класс интерпретатора
 
         if not isinstance(left, (int, float, str)):
             self.error.raise_error(func='_check_comparable', message=f"Operator {op} not supported for {type(left).__name__}")
-
-
-
-
-if __name__ == '__main__':
-
-    # Создаём узлы
-    # var x = 0
-    var_x = VarDeclaration(AxiomTokenType.VAR, 'x', Literal(0))
-
-    # for (var i = 0; i < 3; i = i + 1) { x = x + i; }
-    # инициализатор: var i = 0
-    init = VarDeclaration(AxiomTokenType.VAR, 'i', Literal(0))
-    # условие: i < 3
-    cond = BinaryOp(Identifier('i'), AxiomTokenType.LESS, Literal(3))
-    # инкремент: i = i + 1
-    inc = BinaryOp(Identifier('i'), AxiomTokenType.ASSIGN,
-                   BinaryOp(Identifier('i'), AxiomTokenType.PLUS, Literal(1)))
-    # тело: x = x + i (как выражение, но оно должно быть инструкцией-выражением)
-    body_expr = BinaryOp(Identifier('x'), AxiomTokenType.ASSIGN,
-                         BinaryOp(Identifier('x'), AxiomTokenType.PLUS, Identifier('i')))
-    body_stmt = ExpressionStmt(body_expr)
-    body_block = Block([body_stmt])
-
-    # узел for
-    for_stmt = ForStmt(init, cond, inc, body_block)
-
-    # Программа
-    program = [var_x, for_stmt]
-
-    # Интерпретация
-    interp = AxiomInterpreter()
-    for stmt in program:
-        interp.visit(stmt)
-
-    print(interp.env.get('x'))  # должно быть 3
-    print(interp.env.get('i'))  # ошибка: i не определена
-
-
 
 
 

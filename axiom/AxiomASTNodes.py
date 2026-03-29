@@ -331,11 +331,3 @@ class ReturnValue(Expression):  # Исключение для реализаци
 
 
 
-# TEST
-if __name__ == "__main__":
-    number_literal = Literal(42)
-    string_literal = Literal("hello")
-    variable_x = Identifier("x")
-
-    print(number_literal)  # Literal({'value': 42})
-    print(variable_x)  # Variable({'name': 'x'})

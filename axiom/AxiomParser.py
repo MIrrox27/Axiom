@@ -631,35 +631,3 @@ class AxiomParser:
                 self.eat(AxiomTokenType.SEMICOLON)
             return ExpressionStmt(expr)
 
-
-
-
-
-# TEST
-if __name__ == '__main__':
-
-    tests = [
-
-        'do (x < 1){var x = 1}',
-        'while (x < 1 and x == 2){var x = 1}',
-        ' val a = 1',
-        ' 1 > 1'
-
-    ]
-
-    print("Тестирование")
-    print("=" * 50)
-
-    for code in tests:
-        lexer = AxiomLexer(code)
-        parser = AxiomParser(lexer)
-
-
-        result = parser.parse_statement()
-
-        if parser.current_token.type != AxiomTokenType.EOF:
-            print(f"Внимание: не весь код разобран для '{code}'")
-
-        print(f"{code:15s} → {result}")
-    print("=" * 50)
-

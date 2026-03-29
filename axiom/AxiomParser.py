@@ -565,6 +565,24 @@ class AxiomParser:
         return FunDeclaration(name=name, parameters=parameters, body=body)
 
 
+    def parse_return_statement(self): # парсинг return
+        self.eat(AxiomTokenType.RETURN)
+
+        value = None
+
+        if self.current_token.type != AxiomTokenType.SEMICOLON:
+            value = self.parse_expression()
+
+        if self.current_token.type == AxiomTokenType.SEMICOLON: # точка с запятой обязательна
+            self.eat(AxiomTokenType.SEMICOLON)
+        else:
+            self.error("Expected ';' after return statement", 'parse_return_statement')
+
+        return ReturnStmt(value=value)
+
+
+
+
     def parse_statement(self):
         token = self.current_token
 

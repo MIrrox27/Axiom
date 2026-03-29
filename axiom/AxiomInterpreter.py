@@ -74,6 +74,7 @@ class Callable: # базовый класс для всех функций
 
 
 
+
 class Module:
     def __init__(self, name):
         self.name = name
@@ -92,6 +93,47 @@ class Module:
 
     def __repr__(self):
         return f"<module {self.name}>"
+
+
+
+
+class UserFunction(Callable):
+    def __init__(self, name, parameters, body, closure_env, interpreter):
+
+        # Вызываем конструктор родителя (Callable) и проверяем количество аргументов сами
+        super().__init__(name, -1, None)
+        self.name = name
+        self.parameters = parameters
+        self.body = body
+        self.closure_env = closure_env # окружение на момент объявления
+        self.interpreter = interpreter # ссылка на интерпретатор
+
+
+    def call(self, args):
+        if len(args) != len(self.parameters):
+            self.error.raise_error(
+                f"Function '{self.name}' expects {len(self.parameters)} arguments, got {len(args)}",
+                'call'
+            )
+
+        call_env = AxiomEnvironment(self.closure_env) # создаем новое окружение для вызова функции
+
+        for param_name, arg_value in zip(self.parameters, args): # Связываем параметры с аргументами
+            call_env.define(param_name, arg_value, constant=False)
+
+        previous_env = self.interpreter.env # Сохраняем текущее окружение интерпретатора
+        self.interpreter.env = call_env # Устанавливаем новое окружение в интерпретаторе
+
+
+        try:
+            self.interpreter.visit(self.body)
+        except ReturnValue as ret:
+            return ret.value
+
+        finally:
+            self.interpreter = previous_env
+
+        return None
 
 
 
@@ -189,6 +231,8 @@ class AxiomInterpreter: # класс интерпретатора
         self.modules['math'] = math_module
 
 
+
+        # ---MATH---
     def _register_math_functions(self, module):
         import math as py_math
 

@@ -44,14 +44,14 @@ class AxiomEnvironment: #
     def set(self, name, value): # Изменение значения переменной, не работает с необъявленными переменными
         if name in self.variables:
             if self.variables[name]['constant']:
-                self.error.raise_error(f"Cannot assign to constant '{name}' (declared with val)", 'set')
+                self.env_error(f"Cannot assign to constant '{name}' (declared with val)", 'set')
             self.variables[name]['value'] = value
             return
 
         if self.parent is not None:
             self.parent.set(name, value)
             return
-        self.error.raise_error(f"Variable '{name}' is not defined", 'set')
+        self.env_error(f"Variable '{name}' is not defined", 'set')
 
 
 
@@ -131,7 +131,7 @@ class UserFunction(Callable):
             return ret.value
 
         finally:
-            self.interpreter = previous_env
+            self.interpreter.env = previous_env
 
         return None
 

@@ -480,6 +480,25 @@ class AxiomInterpreter: # класс интерпретатора
             val = self.visit(node.expr)
             return not self.is_truthy(val)
 
+        elif node.operator == AxiomTokenType.PLUS:
+            val = self.visit(node.expr)
+            if not  isinstance(val, (int, float)):
+                self.error.raise_error(
+                f"Unary '+' requires numeric operand, got {type(val).__name__}",
+                'visit_UnaryOp'
+            )
+                return val
+
+        elif node.operator == AxiomTokenType.MINUS:
+            val = self.visit(node.expr)
+            if not  isinstance(val, (int, float)):
+                self.error.raise_error(
+                f"Unary '-' requires numeric operand, got {type(val).__name__}",
+                'visit_UnaryOp'
+            )
+                return -val
+
+
         else:
             self.error.raise_error(f"Unknown unary operator: {node.operator}", 'visit_UnaryOp')
 

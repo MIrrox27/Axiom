@@ -68,11 +68,23 @@ class AxiomParser:
             self.eat(token.type)
             node = Identifier(token.value)
 
-            if self.current_token.type == AxiomTokenType.DOT:
+            if self.current_token.type == AxiomTokenType.INCREMENT:
+                self.eat(AxiomTokenType.INCREMENT)
+                return UnaryOp(operator=AxiomTokenType.INCREMENT, expr=node)
+
+
+            elif self.current_token.type == AxiomTokenType.DECREMENT:
+                self.eat(AxiomTokenType.DECREMENT)
+                return UnaryOp(operator=AxiomTokenType.DECREMENT, expr=node)
+
+
+            elif self.current_token.type == AxiomTokenType.DOT:
                 return self.parse_member_access(node)
+
 
             elif self.current_token.type == AxiomTokenType.LPAREN:
                 return self.parse_call(node)
+
 
             return node
 

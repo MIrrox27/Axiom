@@ -229,7 +229,7 @@ class AxiomInterpreter: # класс интерпретатора
         if node.value is not None:
             value = self.visit(node.value)
 
-        raise ReturnStmt(value) # Вычисляет значение и выбрасывает исключение ReturnValue.
+        raise ReturnValue(value) # Вычисляет значение и выбрасывает исключение ReturnValue.
 
 
 

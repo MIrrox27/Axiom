@@ -114,12 +114,17 @@ class AxiomParser:
     def parse_unary(self): # обработка унарных операторов, пока только not, потом добавлю ++ и --
         token = self.current_token
 
-        if token.type == AxiomTokenType.NOT:
-            self.eat(AxiomTokenType.NOT)
+        if token.type in (AxiomTokenType.NOT,
+                        AxiomTokenType.INCREMENT,
+                        AxiomTokenType.DECREMENT,
+                        AxiomTokenType.MINUS,
+                        AxiomTokenType.PLUS ):
+
+            self.eat(token.type)
             expr = self.parse_unary()
             return UnaryOp(operator=token.type, expr=expr)
-        else:
-            return self.parse_primary()
+
+        return self.parse_primary()
 
 
 

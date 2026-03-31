@@ -262,8 +262,8 @@ class AxiomInterpreter: # класс интерпретатора
         import math as py_math
 
             # функции
-        def sqrt_func(x): #
-            return py_math.sqrt(x)
+        def sqrt_func(expr): #
+            return py_math.sqrt(expr)
         module.define('sqrt', Callable('math.sqrt', 1, sqrt_func))
 
 
@@ -272,11 +272,11 @@ class AxiomInterpreter: # класс интерпретатора
         module.define('pow', Callable('math.pow', 2, pow_func))
 
 
-        def round_func(x, n:int=0, side:str=None):
-            if side == None:
-                output = round(x, n)
+        def round_func(x, n:int=None, side:str=None):
+            if n != None:
+                return round(x, n)
 
-            elif side == 'min':
+            if side == 'min':
                 output = py_math.floor(x)
 
             elif side == 'max':

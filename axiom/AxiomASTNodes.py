@@ -320,7 +320,7 @@ class ReturnStmt(Statement):
         return f"ReturnStmt({self.value})"
 
 
-class ReturnValue(Expression):  # Исключение для реализации оператора return.
+class ReturnValue(Exception):  # Исключение для реализации оператора return.
                                 # Позволяет прервать выполнение функции и вернуть значение.
     def __init__(self, value):
         self.value = value

@@ -170,7 +170,11 @@ class AxiomLexer:
 
             if self.current_char == '+':
                 self.advance()
-                return AxiomToken(AxiomTokenType.PLUS, line=self.line)
+                if self.current_char == '+':
+                    self.advance()
+                    return AxiomToken(AxiomTokenType.INCREMENT, line=self.line)
+                else:
+                    return AxiomToken(AxiomTokenType.PLUS, line=self.line)
 
             if self.current_char == ';':
                 self.advance()
@@ -182,6 +186,9 @@ class AxiomLexer:
 
             if self.current_char == '-':
                 self.advance()
+                if self.current_char == '-':
+                    self.advance()
+                    return AxiomToken(AxiomTokenType.DECREMENT, line=self.line)
                 return AxiomToken(AxiomTokenType.MINUS, line=self.line)
 
             if self.current_char == '*':

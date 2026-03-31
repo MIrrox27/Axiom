@@ -166,7 +166,7 @@ class AxiomInterpreter: # класс интерпретатора
 
         def input_func(prompt=""): # принимает только 1 значение
             return input(str(prompt))
-        self.global_env.define('input', Callable('input', 1, input_func)) # регистрируем функцию
+        self.global_env.define('input', Callable('input', -1, input_func)) # регистрируем функцию
 
 
         def int_func(*args):
@@ -266,13 +266,35 @@ class AxiomInterpreter: # класс интерпретатора
             return py_math.sqrt(x)
         module.define('sqrt', Callable('math.sqrt', 1, sqrt_func))
 
+
         def pow_func(x, y): # возведение в степень
             return x ** y
         module.define('pow', Callable('math.pow', 2, pow_func))
 
+
+        def round_func(x, n:int=0, side:str=None):
+            if side == None:
+                output = round(x, n)
+
+            elif side == 'min':
+                output = py_math.floor(x)
+
+            elif side == 'max':
+                output = py_math.ceil(x)
+
+            else:
+                self.error.raise_error(f'invalid parameter {side}', func='_register_math_functions')
+
+            return output
+
+        module.define('round', Callable('math.round', -1, round_func))
+
             # константы
         module.define('pi', py_math.pi)
         module.define('e', py_math.e)
+
+
+
 
 
 

@@ -303,7 +303,7 @@ class MemberAccess(Expression):
 
 
 class FunDeclaration(Statement):
-    def __init(self, name, parameters, body):
+    def __init__(self, name, parameters, body):
         self.name = name
         self.parameters = parameters
         self.body = body

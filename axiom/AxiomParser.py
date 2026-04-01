@@ -89,16 +89,6 @@ class AxiomParser:
             return node
 
 
-        #elif token.type in self.builtin_functions: # встроенные функции
-            self.eat(token.type)
-            node = Identifier(self.builtin_functions[token.type])
-
-            if self.current_token.type == AxiomTokenType.LPAREN:
-                return self.parse_call(node)
-            else:
-                self.error(f"Expected '(' after {token.type.name}", 'parse_primary')
-
-
         # символы (скобки)
         elif token.type == AxiomTokenType.LPAREN:
             self.eat(AxiomTokenType.LPAREN) #

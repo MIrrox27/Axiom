@@ -70,12 +70,12 @@ class AxiomParser:
 
             if self.current_token.type == AxiomTokenType.INCREMENT:
                 self.eat(AxiomTokenType.INCREMENT)
-                return UnaryOp(operator=AxiomTokenType.INCREMENT, expr=node)
+                return UnaryOp(operator=AxiomTokenType.POST_INCREMENT, expr=node)
 
 
             elif self.current_token.type == AxiomTokenType.DECREMENT:
                 self.eat(AxiomTokenType.DECREMENT)
-                return UnaryOp(operator=AxiomTokenType.DECREMENT, expr=node)
+                return UnaryOp(operator=AxiomTokenType.POST_DECREMENT, expr=node)
 
 
             elif self.current_token.type == AxiomTokenType.DOT:

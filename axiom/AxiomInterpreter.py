@@ -482,12 +482,13 @@ class AxiomInterpreter: # класс интерпретатора
 
         elif node.operator == AxiomTokenType.PLUS:
             val = self.visit(node.expr)
-            if not  isinstance(val, (int, float)):
+
+            if not isinstance(val, (int, float)):
                 self.error.raise_error(
                 f"Unary '+' requires numeric operand, got {type(val).__name__}",
                 'visit_UnaryOp'
             )
-                return val
+            return val
 
         elif node.operator == AxiomTokenType.MINUS:
             val = self.visit(node.expr)
@@ -496,7 +497,7 @@ class AxiomInterpreter: # класс интерпретатора
                 f"Unary '-' requires numeric operand, got {type(val).__name__}",
                 'visit_UnaryOp'
             )
-                return -val
+            return -val
 
 
         elif node.operator == AxiomTokenType.INCREMENT:
@@ -518,6 +519,7 @@ class AxiomInterpreter: # класс интерпретатора
             self.env.set(var_name, new_val)
             return new_val
 
+
         elif node.operator == AxiomTokenType.DECREMENT:
             if not isinstance(node.expr, Identifier):
                 self.error.raise_error(
@@ -538,49 +540,62 @@ class AxiomInterpreter: # класс интерпретатора
             return new_val
 
 
+
         elif node.operator == AxiomTokenType.POST_INCREMENT:
-            if not  isinstance(node.operator, Identifier):
+
+            if not isinstance(node.expr, Identifier):
                 self.error.raise_error(
+
                     f"Increment operator requires a variable, got {type(node.expr).__name__}",
+
                     'visit_UnaryOp'
+
                 )
 
             var_name = node.expr.name
+
             current_val = self.env.get(var_name)
 
             if not isinstance(current_val, (int, float)):
                 self.error.raise_error(
-                f"Cannot increment non-numeric value {current_val}",
-                'visit_UnaryOp')
+
+                    f"Cannot increment non-numeric value {current_val}",
+
+                    'visit_UnaryOp')
 
             new_val = current_val + 1
+
             self.env.set(var_name, new_val)
-            return current_val # постфиксный возвращает старое значение
+
+            return current_val # возвращаем изначальное значение
+
+
 
         elif node.operator == AxiomTokenType.POST_DECREMENT:
-            if not  isinstance(node.operator, Identifier):
+
+            if not isinstance(node.expr, Identifier):
                 self.error.raise_error(
+
                     f"Decrement operator requires a variable, got {type(node.expr).__name__}",
-                'visit_UnaryOp'
-                )
+
+                    'visit_UnaryOp')
 
             var_name = node.expr.name
+
             current_val = self.env.get(var_name)
 
             if not isinstance(current_val, (int, float)):
                 self.error.raise_error(
-                f"Cannot decrement non-numeric value {current_val}",
-                'visit_UnaryOp'
-                )
+
+                    f"Cannot decrement non-numeric value {current_val}",
+
+                    'visit_UnaryOp')
 
             new_val = current_val - 1
+
             self.env.set(var_name, new_val)
-            return current_val # постфиксный возвращает старое значение
 
-
-
-
-
+            return current_val # возвращаем изначальное значение
 
 
         else:

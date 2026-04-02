@@ -96,6 +96,10 @@ class Module:
 
 
 
+class LORMSModule(Module): # "LORMS" - library of ready-made solutions
+    pass
+
+
 
 class UserFunction(Callable):
     def __init__(self, name, parameters, body, closure_env, interpreter):
@@ -150,6 +154,7 @@ class AxiomInterpreter: # класс интерпретатора
 
         self._register_builtins() # регистрируем все функции
         self._register_standard_modules() # регистрируем стандартные модули
+
 
 
 
@@ -294,6 +299,11 @@ class AxiomInterpreter: # класс интерпретатора
         module.define('e', py_math.e)
 
 
+
+            # ----- WEB -----
+    def register_web_functions(self, module):
+        from axiom.modules.AxiomWebModule import *
+        pass
 
 
 

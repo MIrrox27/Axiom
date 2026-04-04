@@ -96,8 +96,8 @@ class Module:
 
 
 
-class LORMSModule(Module): # "LORMS" - library of ready-made solutions
-    pass
+#class LORMSModule(Module): # "LORMS" - library of ready-made solutions
+
 
 
 
@@ -302,7 +302,7 @@ class AxiomInterpreter: # класс интерпретатора
 
             # ----- WEB -----
     def register_web_functions(self, module):
-        from axiom.modules.AxiomWebModule import *
+        #from axiom.modules.web import *
         pass
 
 

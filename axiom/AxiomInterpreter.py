@@ -266,15 +266,17 @@ class AxiomInterpreter: # класс интерпретатора
     def _register_math_functions(self, module):
         import math as py_math
 
+        module_name = module.name
+
             # функции
         def sqrt_func(expr): #
             return py_math.sqrt(expr)
-        module.define('sqrt', Callable('math.sqrt', 1, sqrt_func))
+        module.define('sqrt', Callable(f'{module_name}.sqrt', 1, sqrt_func))
 
 
         def pow_func(x, y): # возведение в степень
             return x ** y
-        module.define('pow', Callable('math.pow', 2, pow_func))
+        module.define('pow', Callable(f'{module_name}.pow', 2, pow_func))
 
 
         def round_func(x, n:int=None, side:str=None):
@@ -292,7 +294,7 @@ class AxiomInterpreter: # класс интерпретатора
 
             return output
 
-        module.define('round', Callable('math.round', -1, round_func))
+        module.define('round', Callable(f'{module_name}.round', -1, round_func))
 
             # константы
         module.define('pi', py_math.pi)

@@ -1,6 +1,11 @@
+# author https://github.com/MIrrox27/Axiom
+# Общие основные классы
+
 import http, requests, urllib, webbrowser, socket, ssl
 import json, socketserver
 from http.server import HTTPServer, SimpleHTTPRequestHandler, BaseHTTPRequestHandler
+
+from axiom.modules.web import AxiomWebRouter, AxiomWebRequest, AxiomWebResponse
 
 class Output:
     def __init__(self, module):
@@ -17,17 +22,6 @@ class Output:
 
 
 
-class WebHandler(BaseHTTPRequestHandler):
-
-    def do_GET(self, headers=("Content-type", "text/html; charset=utf-8"), response_body=None):
-        self.send_response(200)
-        self.send_header(headers[0], headers[1])
-        self.end_headers()
-        self.wfile.write(response_body.encode("utf-8"))
-
-
-    def do_POST(self):
-        pass
 
 
 

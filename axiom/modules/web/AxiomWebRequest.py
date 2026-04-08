@@ -12,6 +12,8 @@ class Request:
         self.body = body # тело запроса
 
         self.qwery = {}
+        params = []
+
 
 
 
@@ -21,7 +23,8 @@ class Request:
             return output
 
         try:
-           output = json.load(self.body)
+            data = self.body.decode('utf-8')
+            output = json.load(data)
 
         except ValueError:
             return "I dont understand this data-type"

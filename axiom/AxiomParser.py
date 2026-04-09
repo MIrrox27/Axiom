@@ -282,6 +282,88 @@ class AxiomParser:
         return Block(statements=statements)
 
 
+    def parse_python_block(self):
+        func = 'parse_python_block'
+        self.eat(AxiomTokenType.BLOCK)
+
+        if self.current_token.type != AxiomTokenType.PYTHON:
+            self.error("Expected language name after 'block'", func)
+        self.eat(AxiomTokenType.PYTHON)
+
+        outputs = []
+        if self.current_token.type == AxiomTokenType.ARROW: # получаем все возвращаемые переменные
+            while True:
+                if self.current_token.type != AxiomTokenType.IDENTIFIER:
+                    self.error("Expected variable name after '->'", func)
+
+                var_name = self.current_token.value
+                self.eat(AxiomTokenType.IDENTIFIER)
+                outputs.append(var_name)
+
+                if self.current_token.type == AxiomTokenType.COMMA:
+                    self.eat(AxiomTokenType.COMMA)
+                    continue
+
+                else:
+                    break
+
+        # Парсим сам блок с кодом
+        if self.current_token.type == AxiomTokenType.LBRACE:
+            self.error("Expected '{' to start Python block", func)
+
+        self.eat(AxiomTokenType.LBRACE)
+
+        brace_count = 1
+        code_lines = []
+        current_line = []
+
+        while brace_count > 0:
+            if self.current_token.type == AxiomTokenType.EOF:
+                self.error("Unclosed Python block, expected '}'", func)
+
+            if self.current_token.type == AxiomTokenType.LBRACE:
+                brace_count += 1
+
+            elif self.current_token.type == AxiomTokenType.RBRACE:
+                brace_count -= 1
+
+                if brace_count == 0: # Закрывающая скобка блока — не включаем её в код
+                    break
+
+
+            # Добавляем значение токена в код
+            # Для разных типов токенов нужно разное представление
+            if self.current_token.type == AxiomTokenType.STRING:
+                current_line.append(f'"{self.current_token.value}"')
+
+            elif self.current_token.type == AxiomTokenType.IDENTIFIER:
+                current_line.append(self.current_token.value)
+
+            else:
+                if self.current_token.value is not None:
+                    current_line.append(str(self.current_token.value))
+
+                else:
+                    current_line.append(self.current_token.type.name.lower())
+
+
+            self.eat(self.current_token.type)
+
+            # Если текущий символ — перевод строки, завершаем строку
+            if hasattr(self.lexer, 'current_char') and self.lexer.current_char == '\n':
+                code_lines.append(''.join(current_line))
+                current_line = []
+
+
+            if current_line:
+                code_lines.append(''.join(current_line))
+
+            code = '\n'.join(code_lines)
+            inputs = [] # Пока оставим пустым, потом можно реализовать автоматический анализ
+
+            return PythonBlock(code, inputs, outputs)
+
+
 
             # -----ПЕРЕМЕННЫЕ-----
 

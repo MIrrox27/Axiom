@@ -284,22 +284,22 @@ class AxiomParser:
         self.eat(AxiomTokenType.RBRACE)
         return Block(statements=statements)
 
-
     def parse_python_block(self):
         func = 'parse_python_block'
-        self.eat(AxiomTokenType.BLOCK)
 
+        self.eat(AxiomTokenType.BLOCK)
         if self.current_token.type != AxiomTokenType.PYTHON:
             self.error("Expected language name after 'block'", func)
         self.eat(AxiomTokenType.PYTHON)
 
+
+        # Парсим выходные переменные
         outputs = []
-        if self.current_token.type == AxiomTokenType.ARROW: # получаем все возвращаемые переменные
+        if self.current_token.type == AxiomTokenType.ARROW:
             self.eat(AxiomTokenType.ARROW)
             while True:
                 if self.current_token.type != AxiomTokenType.IDENTIFIER:
                     self.error("Expected variable name after '->'", func)
-
                 var_name = self.current_token.value
                 self.eat(AxiomTokenType.IDENTIFIER)
                 outputs.append(var_name)
@@ -307,64 +307,140 @@ class AxiomParser:
                 if self.current_token.type == AxiomTokenType.COMMA:
                     self.eat(AxiomTokenType.COMMA)
                     continue
-
                 else:
                     break
 
-        # Парсим сам блок с кодом
         if self.current_token.type != AxiomTokenType.LBRACE:
             self.error("Expected '{' to start Python block", func)
 
         self.eat(AxiomTokenType.LBRACE)
 
         brace_count = 1
-        code_lines = []
-        current_line = []
+        code_parts = []
 
         while brace_count > 0:
             if self.current_token.type == AxiomTokenType.EOF:
                 self.error("Unclosed Python block, expected '}'", func)
 
+            # Открывающая скобка
             if self.current_token.type == AxiomTokenType.LBRACE:
                 brace_count += 1
+                code_parts.append('{')
+                self.eat(AxiomTokenType.LBRACE)
+                continue
 
-            elif self.current_token.type == AxiomTokenType.RBRACE:
+            # Закрывающая скобка
+            if self.current_token.type == AxiomTokenType.RBRACE:
                 brace_count -= 1
-
-                if brace_count == 0: # Закрывающая скобка блока — не включаем её в код
+                if brace_count == 0:
+                    self.eat(AxiomTokenType.RBRACE)
                     break
+                else:
+                    code_parts.append('}')
+                    self.eat(AxiomTokenType.RBRACE)
+                    continue
 
-            # Добавляем значение токена в код
-            # Для разных типов токенов нужно разное представление
-            if self.current_token.type == AxiomTokenType.STRING:
-                current_line.append(f'"{self.current_token.value}"')
+            # Добавляем токен в зависимости от его типа
+            token = self.current_token
 
-            elif self.current_token.type == AxiomTokenType.IDENTIFIER:
-                current_line.append(self.current_token.value)
+            if token.type == AxiomTokenType.STRING:
+                # Строка с кавычками
+                code_parts.append(f'"{token.value}"')
+
+            elif token.type == AxiomTokenType.IDENTIFIER:
+                # Идентификатор (print, x, и т.д.)
+                code_parts.append(token.value)
+
+            elif token.type in (AxiomTokenType.INTEGER, AxiomTokenType.FLOAT):
+                # Числа
+                code_parts.append(str(token.value))
+
+            elif token.type == AxiomTokenType.LPAREN:
+                code_parts.append('(')
+
+            elif token.type == AxiomTokenType.RPAREN:
+                code_parts.append(')')
+
+            elif token.type == AxiomTokenType.LBRACKET:
+                code_parts.append('[')
+
+            elif token.type == AxiomTokenType.RBRACKET:
+                code_parts.append(']')
+
+            elif token.type == AxiomTokenType.PLUS:
+                code_parts.append('+')
+
+            elif token.type == AxiomTokenType.MINUS:
+                code_parts.append('-')
+
+            elif token.type == AxiomTokenType.MULTIPLY:
+                code_parts.append('*')
+
+            elif token.type == AxiomTokenType.DIVIDE:
+                code_parts.append('/')
+
+            elif token.type == AxiomTokenType.ASSIGN:
+                code_parts.append('=')
+
+            elif token.type == AxiomTokenType.EQUALS:
+                code_parts.append('==')
+
+            elif token.type == AxiomTokenType.NOT_EQUALS:
+                code_parts.append('!=')
+
+            elif token.type == AxiomTokenType.LESS:
+                code_parts.append('<')
+
+            elif token.type == AxiomTokenType.GREATER:
+                code_parts.append('>')
+
+            elif token.type == AxiomTokenType.LESS_EQUAL:
+                code_parts.append('<=')
+
+            elif token.type == AxiomTokenType.GREATER_EQUAL:
+                code_parts.append('>=')
+
+            elif token.type == AxiomTokenType.AND:
+                code_parts.append('and')
+
+            elif token.type == AxiomTokenType.OR:
+                code_parts.append('or')
+
+            elif token.type == AxiomTokenType.NOT:
+                code_parts.append('not')
+
+            elif token.type == AxiomTokenType.SEMICOLON:
+                code_parts.append(';')
+
+            elif token.type == AxiomTokenType.COMMA:
+                code_parts.append(',')
+
+            elif token.type == AxiomTokenType.COLON:
+                code_parts.append(':')
+
+            elif token.type == AxiomTokenType.DOT:
+                code_parts.append('.')
+
+            elif token.type == AxiomTokenType.POWER:
+                code_parts.append('**')
+
+            elif token.type == AxiomTokenType.MOD:
+                code_parts.append('%')
 
             else:
-                if self.current_token.value is not None:
-                    current_line.append(str(self.current_token.value))
+                # Для неизвестных токенов — предупреждение
+                code_parts.append(f'<{token.type.name.lower()}>')
 
-                else:
-                    current_line.append(self.current_token.type.name.lower())
+            self.eat(token.type)
 
+        # Собираем код
+        code = ''.join(code_parts)
 
-            self.eat(self.current_token.type)
+        # Удаляем лишние пробелы в начале и конце
+        code = code.strip()
 
-            # Если текущий символ — перевод строки, завершаем строку
-            if hasattr(self.lexer, 'current_char') and self.lexer.current_char == '\n':
-                code_lines.append(''.join(current_line))
-                current_line = []
-
-            if current_line:
-                code_lines.append(''.join(current_line))
-
-            code = '\n'.join(code_lines)
-            inputs = [] # Пока оставим пустым, потом можно реализовать автоматический анализ
-
-            return PythonBlock(code, inputs, outputs)
-
+        inputs = []
+        return PythonBlock(code, inputs, outputs)
 
 
             # -----ПЕРЕМЕННЫЕ-----

@@ -651,11 +651,29 @@ class AxiomInterpreter: # класс интерпретатора
     def visit_PythonBlock(self, node): # Выполняет блок кода на Python.
         func = 'visit_PythonBlock'
 
-        namespace = {}
-        env_vars = self._get_all_variables(self.env)
+        # Создаём чистое пространство имён
+        namespace = {
+            # Стандартные функции Python
+            'print': print,
+            'len': len,
+            'str': str,
+            'int': int,
+            'float': float,
+            'bool': bool,
+            'list': list,
+            'dict': dict,
+            'tuple': tuple,
+            'set': set,
+            'type': type,
+            'range': range,
+            'sum': sum,
+            'min': min,
+            'max': max,
+            'abs': abs,
+            'round': round,
+            'sorted': sorted,
+        }
 
-        for var_name, var_info in env_vars.items():
-            namespace[var_name] = var_info['value']
 
         try:
             exec(node.code, namespace)
@@ -665,22 +683,20 @@ class AxiomInterpreter: # класс интерпретатора
                 func
             )
 
+        # Обработка выходных переменных
         if node.outputs:
             result = []
             for output in node.outputs:
                 if output in namespace:
                     result.append(namespace[output])
-
                 else:
                     self.error.raise_error(
                         f"Output variable '{output}' not defined in Python block",
                         func
                     )
-
             return result[0] if len(result) == 1 else result
         else:
             return None
-
 
 
 

@@ -163,6 +163,17 @@ class AxiomLexer:
         else:
             return AxiomTokenType.INTEGER, int(result) # если точки нет, возвращаем int
 
+
+
+    # В AxiomLexer.py добавьте:
+    def get_text_between(self, start, end):
+        """Возвращает подстроку исходного кода от позиции start до end (не включая end)"""
+        if start >= end:
+            return ""
+        return self.text[start:end]
+
+
+
     def get_next_token(self, debug: bool=False):
         while self.current_char is not None:  # пока символ который мы проверяем не равен None
             if debug == True:

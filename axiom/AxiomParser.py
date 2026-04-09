@@ -64,6 +64,9 @@ class AxiomParser:
             self.eat(token.type)
             return  Literal(token.value)
 
+        elif token.type == AxiomTokenType.BLOCK:
+            return self.parse_python_block() # здесь сделаю проверки для других языков программирования
+
         elif token.type == AxiomTokenType.IDENTIFIER:
             self.eat(token.type)
             node = Identifier(token.value)
@@ -330,7 +333,6 @@ class AxiomParser:
                 if brace_count == 0: # Закрывающая скобка блока — не включаем её в код
                     break
 
-
             # Добавляем значение токена в код
             # Для разных типов токенов нужно разное представление
             if self.current_token.type == AxiomTokenType.STRING:
@@ -353,7 +355,6 @@ class AxiomParser:
             if hasattr(self.lexer, 'current_char') and self.lexer.current_char == '\n':
                 code_lines.append(''.join(current_line))
                 current_line = []
-
 
             if current_line:
                 code_lines.append(''.join(current_line))

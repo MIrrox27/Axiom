@@ -15,29 +15,40 @@ class AxiomLexer:
         self.current_char = self.text[
             0] if self.text else None  # символ, который мы сейчас обрабатываем. Т. е если символ text не равен None то мы присваиваем self.current_char значение этого символа, иначе self.current_char = None
         self.KEYWORDS = {  # ключевые слова
-            'fun': AxiomTokenType.FUN,
+            'import': AxiomTokenType.IMPORT,
+
             'if': AxiomTokenType.IF,
             'elif': AxiomTokenType.ELIF,
             'else': AxiomTokenType.ELSE,
+
             'while': AxiomTokenType.WHILE,
             'do': AxiomTokenType.DO,
             'for': AxiomTokenType.FOR,
             'foreach': AxiomTokenType.FOREACH,
+
             'var': AxiomTokenType.VAR,
             'val': AxiomTokenType.VAL,
+
             'True': AxiomTokenType.BOOL,
             'False': AxiomTokenType.BOOL,
-            'class': AxiomTokenType.CLASS,
-            'import': AxiomTokenType.IMPORT,
-            'enum': AxiomTokenType.ENUM,
-            'script': AxiomTokenType.SCRIPT,
-            'config': AxiomTokenType.CONFIG,
+
+            #'class': AxiomTokenType.CLASS,
+            #'enum': AxiomTokenType.ENUM,
+
+            #'script': AxiomTokenType.SCRIPT,
+            #'config': AxiomTokenType.CONFIG,
+
+            'block': AxiomTokenType.BLOCK,
+            'python': AxiomTokenType.PYTHON,
+
             'is': AxiomTokenType.IS,
             'in': AxiomTokenType.IN,
             'and': AxiomTokenType.AND,
             'or': AxiomTokenType.OR,
             'None': AxiomTokenType.NONE,
             'not': AxiomTokenType.NOT,
+
+            'fun': AxiomTokenType.FUN,
             'return': AxiomTokenType.RETURN
         }
 

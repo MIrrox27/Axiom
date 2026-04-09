@@ -179,6 +179,7 @@ class AxiomLexer:
 
             # -- операторы и разделители --
 
+
             if self.current_char == '+':
                 self.advance()
                 if self.current_char == '+':
@@ -187,20 +188,20 @@ class AxiomLexer:
                 else:
                     return AxiomToken(AxiomTokenType.PLUS, line=self.line)
 
-            if self.current_char == ';':
-                self.advance()
-                return AxiomToken(AxiomTokenType.SEMICOLON, line=self.line)
-
-            if self.current_char == ':':
-                self.advance()
-                return AxiomToken(AxiomTokenType.COLON, line=self.line)
 
             if self.current_char == '-':
                 self.advance()
+
                 if self.current_char == '-':
                     self.advance()
                     return AxiomToken(AxiomTokenType.DECREMENT, line=self.line)
+
+                if self.current_char == '>':
+                    self.advance()
+                    return AxiomToken(AxiomTokenType.ARROW, line=self.line)
+
                 return AxiomToken(AxiomTokenType.MINUS, line=self.line)
+
 
             if self.current_char == '*':
                 self.advance()
@@ -211,17 +212,16 @@ class AxiomLexer:
                 else:
                     return AxiomToken(AxiomTokenType.MULTIPLY, line=self.line)
 
+
             if self.current_char == '/':
                 self.advance()
+
                 if self.current_char == '/':  # Комментарий //
                     self.skip_comment()
                     continue
                 else:
                     return AxiomToken(AxiomTokenType.DIVIDE, line=self.line)
 
-            if self.current_char == '%':
-                self.advance()
-                return  AxiomToken(AxiomTokenType.MOD, line=self.line)
 
             if self.current_char == '=':
                 self.advance()
@@ -230,25 +230,27 @@ class AxiomLexer:
                     self.advance()
                     return AxiomToken(AxiomTokenType.EQUALS, line=self.line)
 
-                else:
-                    return AxiomToken(AxiomTokenType.ASSIGN, line=self.line)
+                return AxiomToken(AxiomTokenType.ASSIGN, line=self.line)
+
 
             if self.current_char == '&':
                 self.advance()
+
                 if self.current_char == '&':
                     self.advance()
                     return AxiomToken(AxiomTokenType.AND)
-                else:
-                    self.error('[get_next_token] Where is the second "&" ?')
+
+                self.error('[get_next_token] Where is the second "&" ?')
+
 
             if self.current_char == '|':
                 self.advance()
+
                 if self.current_char == '|':
                     self.advance()
                     return AxiomToken(AxiomTokenType.OR)
-                else:
-                    self.error('[get_next_token] Where is the second "|" ?')
 
+                self.error('[get_next_token] Where is the second "|" ?')
 
 
             if self.current_char == '!':
@@ -257,27 +259,43 @@ class AxiomLexer:
                 if self.current_char == '=':
                     self.advance()
                     return AxiomToken(AxiomTokenType.NOT_EQUALS)
-                else:
-                    return AxiomToken(AxiomTokenType.NOT)
+
+                return AxiomToken(AxiomTokenType.NOT)
+
 
             if self.current_char == '<':
                 self.advance()
+
                 if self.current_char == '=':
                     self.advance()
                     return AxiomToken(AxiomTokenType.LESS_EQUAL, line=self.line)
 
-                else:
-                    return AxiomToken(AxiomTokenType.LESS, line=self.line)
+
+                return AxiomToken(AxiomTokenType.LESS, line=self.line)
+
 
             if self.current_char == '>':
                 self.advance()
+
                 if self.current_char == '=':
                     self.advance()
                     return AxiomToken(AxiomTokenType.GREATER_EQUAL, line=self.line)
 
-                else:
-                    return AxiomToken(AxiomTokenType.GREATER, line=self.line)
+                return AxiomToken(AxiomTokenType.GREATER, line=self.line)
 
+
+
+            if self.current_char == ';':
+                self.advance()
+                return AxiomToken(AxiomTokenType.SEMICOLON, line=self.line)
+
+            if self.current_char == ':':
+                self.advance()
+                return AxiomToken(AxiomTokenType.COLON, line=self.line)
+
+            if self.current_char == '%':
+                self.advance()
+                return  AxiomToken(AxiomTokenType.MOD, line=self.line)
 
             if self.current_char == '(':
                 self.advance()
@@ -323,15 +341,18 @@ class AxiomLexer:
                 token_type, value = self.read_string_single_quotes()
                 return AxiomToken(token_type, value, self.line)
 
-            if self.current_char == "#":  # если символ который мы проверяем равен символу комментария ( я сделал 2 символа комментариев)
+
+            if self.current_char == "#":  # если символ который мы проверяем равен символу комментария (я сделал 2 символа комментариев)
                 self.skip_comment()  # то мы вызываем функцию для пропуска коммментов
                 continue  # continue начинает цикл заново с нового символа. Это гарантирует, что после пропуска пробелов/комментариев мы обработаем следующий значимый символ
+
 
             if self.current_char is not None and (self.current_char.isalpha() or self.current_char == '_'):
                 identifier = self.read_identifier()
 
                 if identifier in self.KEYWORDS: # ищем ключевое слово
                     token_type = self.KEYWORDS[identifier]
+
 
                     # Для булевых значений возвращаем их значение
                     if token_type == AxiomTokenType.BOOL:

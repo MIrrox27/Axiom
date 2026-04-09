@@ -202,55 +202,6 @@ class AxiomInterpreter: # класс интерпретатора
         # тут будут все остальные функции
 
 
-    def visit_MemberAccess(self, node):  # Вычисляет доступ к члену объекта
-        obj = self.visit(node.obj)
-
-        if not isinstance(obj, Module):
-            self.error.raise_error(f"Cannot access member of non-module object: {obj}", 'visit_MemberAccess')
-
-        #print(f"DEBUG: Accessing {node.obj}.{node.member}")
-        return obj.get(node.member)
-
-
-
-    def visit_ImportStmt(self, node):  # Выполняет импорт модуля
-        module_name = node.module_name
-
-        if module_name not in self.modules:
-            self.error.raise_error(f"Module '{module_name}' not found", func="visit_ImportStmt")
-
-        module = self.modules[module_name]
-
-        #print(f"DEBUG: Importing module {module_name}")
-        #print(f"DEBUG: Module object: {module}")
-
-        self.global_env.define(module_name, module, constant=False)
-        return None
-
-
-
-    def visit_ReturnStmt(self, node): # Выполняет оператор return.
-        value = None
-        if node.value is not None:
-            value = self.visit(node.value)
-
-        raise ReturnValue(value) # Вычисляет значение и выбрасывает исключение ReturnValue.
-
-
-
-    def visit_FunDeclaration(self, node): # Создаёт пользовательскую функцию и сохраняет её в окружении.
-        func = UserFunction(
-            name=node.name,
-            parameters=node.parameters,
-            body=node.body,
-            closure_env=self.env,
-            interpreter=self
-        )
-
-        self.env.define(node.name, func, constant=False)
-        return None
-
-
 
 
             # --------БИБЛИОТЕКИ (МОДУЛИ)--------
@@ -303,45 +254,13 @@ class AxiomInterpreter: # класс интерпретатора
 
 
             # ----- WEB -----
+
     def register_web_functions(self, module):
         #from axiom.modules.web import *
         pass
 
 
-
-
-
-
-    def visit_CallExpr(self, node): # выполняет вызов функции
-        callee = self.visit(node.callee)
-
-        if not isinstance(callee, Callable): # проверяем что это функция
-
-            if isinstance(node.callee, MemberAccess):
-
-                if isinstance(node.callee.obj):
-                    obj_name = node.callee.obj.name
-                else:
-                    obj_name = str(node.callee.obj)
-                callee_name = f"{obj_name}.{node.callee.member}"
-
-            elif isinstance(node.callee, Identifier):
-                callee_name = node.callee.name
-            else:
-                callee_name = str(node.callee)
-
-            self.error.raise_error(f"'{callee_name}' is not a function (got {type(callee).__name__})", func='visit_CallExpr')
-
-
-
-        args = []
-        for arg_node in node.arguments:
-            arg_value = self.visit(arg_node)
-            args.append(arg_value)
-
-        return callee.call(args)
-
-
+            # -----visit_------
 
     def visit(self, node): # основной метод создания
         method_name = f'visit_{type(node).__name__}'
@@ -400,6 +319,17 @@ class AxiomInterpreter: # класс интерпретатора
     def visit_ExpressionStmt(self, node): # временно делаем
         self.visit(node.expression) # Вычисляем выражение, результат отбрасываем
         return None
+
+
+
+    def visit_MemberAccess(self, node):  # Вычисляет доступ к члену объекта
+        obj = self.visit(node.obj)
+
+        if not isinstance(obj, Module):
+            self.error.raise_error(f"Cannot access member of non-module object: {obj}", 'visit_MemberAccess')
+
+        # print(f"DEBUG: Accessing {node.obj}.{node.member}")
+        return obj.get(node.member)
 
 
 
@@ -636,6 +566,7 @@ class AxiomInterpreter: # класс интерпретатора
         return None
 
 
+        # ---Циклы---
 
     def visit_WhileStmt(self, node): # обработка while
         while True:  # пока условие верное, выполняем действия
@@ -716,7 +647,117 @@ class AxiomInterpreter: # класс интерпретатора
 
 
 
-        # Вспомогательные функции для проверки типов
+        # ---Блоки кода---
+    def visit_PythonBlock(self, node): # Выполняет блок кода на Python.
+        func = 'visit_PythonBlock'
+
+        namespace = {}
+        env_vars = self._get_all_variables(self.env)
+
+        for var_name, var_info in env_vars.items():
+            namespace[var_name] = var_info['value']
+
+        try:
+            exec(node.code, namespace)
+        except Exception as e:
+            self.error.raise_error(
+                f"Error executing Python block: {str(e)}",
+                func
+            )
+
+        if node.outputs:
+            result = []
+            for output in node.outputs:
+                if output in namespace:
+                    result.append(namespace[output])
+
+                else:
+                    self.error.raise_error(
+                        f"Output variable '{output}' not defined in Python block",
+                        func
+                    )
+
+            return result[0] if len(result) == 1 else result
+        else:
+            return None
+
+
+
+
+    def visit_ImportStmt(self, node):  # Выполняет импорт модуля
+        module_name = node.module_name
+
+        if module_name not in self.modules:
+            self.error.raise_error(f"Module '{module_name}' not found", func="visit_ImportStmt")
+
+        module = self.modules[module_name]
+
+        # print(f"DEBUG: Importing module {module_name}")
+        # print(f"DEBUG: Module object: {module}")
+
+        self.global_env.define(module_name, module, constant=False)
+        return None
+
+
+
+        # ---Функции---
+    def visit_FunDeclaration(self, node):  # Создаёт пользовательскую функцию и сохраняет её в окружении.
+        func = UserFunction(
+            name=node.name,
+            parameters=node.parameters,
+            body=node.body,
+            closure_env=self.env,
+            interpreter=self
+        )
+
+        self.env.define(node.name, func, constant=False)
+        return None
+
+
+
+    def visit_CallExpr(self, node): # выполняет вызов функции
+        callee = self.visit(node.callee)
+
+        if not isinstance(callee, Callable): # проверяем что это функция
+
+            if isinstance(node.callee, MemberAccess):
+
+                if isinstance(node.callee.obj):
+                    obj_name = node.callee.obj.name
+                else:
+                    obj_name = str(node.callee.obj)
+                callee_name = f"{obj_name}.{node.callee.member}"
+
+            elif isinstance(node.callee, Identifier):
+                callee_name = node.callee.name
+            else:
+                callee_name = str(node.callee)
+
+            self.error.raise_error(f"'{callee_name}' is not a function (got {type(callee).__name__})", func='visit_CallExpr')
+
+
+
+        args = []
+        for arg_node in node.arguments:
+            arg_value = self.visit(arg_node)
+            args.append(arg_value)
+
+        return callee.call(args)
+
+
+
+    def visit_ReturnStmt(self, node):  # Выполняет оператор return.
+        value = None
+        if node.value is not None:
+            value = self.visit(node.value)
+
+        raise ReturnValue(value)  # Вычисляет значение и выбрасывает исключение ReturnValue.
+
+
+
+
+        # -----Вспомогательные функции для проверки типов-----
+
     def is_truthy(self, value): # смотрит, является ли значение истинным
         # в Axiom false, 0 и nill считаются ложными, все остальное истинными
         if value is False or value is None:
@@ -764,7 +805,16 @@ class AxiomInterpreter: # класс интерпретатора
 
 
 
+    def _get_all_variables(self, env): #  Рекурсивно собирает все переменные из окружения и его родителей
+        result = {}
 
+        # Сначала собираем переменные из родителя
+        if env.parent is not None:
+            result.update(self._get_all_variables(env.parent))
+
+        # Потом добавляем/перезаписываем переменные текущего окружения
+        result.update(env.variables)
+        return result # {'value': значение, 'constant': bool}
 
 
 

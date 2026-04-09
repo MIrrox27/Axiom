@@ -329,5 +329,49 @@ class ReturnValue(Exception):  # Исключение для реализаци�
 
 
 
+class PythonBlock(Expression):
+    def __init__(self, code, inputs=None, outputs=None):
+        self.code = code
+        self.inputs = inputs or []
+        self.outputs = outputs or []
+
+
+    def __repr__(self):
+        return f"PythonBlock(code='''{self.code}''', inputs={self.inputs}, outputs={self.outputs})"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 

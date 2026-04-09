@@ -295,6 +295,7 @@ class AxiomParser:
 
         outputs = []
         if self.current_token.type == AxiomTokenType.ARROW: # получаем все возвращаемые переменные
+            self.eat(AxiomTokenType.ARROW)
             while True:
                 if self.current_token.type != AxiomTokenType.IDENTIFIER:
                     self.error("Expected variable name after '->'", func)
@@ -311,7 +312,7 @@ class AxiomParser:
                     break
 
         # Парсим сам блок с кодом
-        if self.current_token.type == AxiomTokenType.LBRACE:
+        if self.current_token.type != AxiomTokenType.LBRACE:
             self.error("Expected '{' to start Python block", func)
 
         self.eat(AxiomTokenType.LBRACE)

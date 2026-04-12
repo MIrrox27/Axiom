@@ -14,6 +14,11 @@ class AxiomLexer:
         self.line = 1  # линия (строка в которой мы находимся) (по типу координаты Y)
         self.current_char = self.text[
             0] if self.text else None  # символ, который мы сейчас обрабатываем. Т. е если символ text не равен None то мы присваиваем self.current_char значение этого символа, иначе self.current_char = None
+
+
+        self.num_of_code_blocks = 0
+        self.code_blocks = []
+
         self.KEYWORDS = {  # ключевые слова
             'import': AxiomTokenType.IMPORT,
 
@@ -66,6 +71,18 @@ class AxiomLexer:
         else:
             self.current_char = self.text[self.position]  # иначе self.символ_для_обработки = self.код[позиция_в_коде]
 
+
+
+    def retreat(self):  # функция, которая двигает вперед наш курсор
+        if self.current_char == "\n":
+            self.line -= 1  # если current_char равен символу перехода строки, то мы опускаемся вниз
+        self.position -= 1  # так как мы прошли символ перехода строки, надо переместиться на новый символ
+
+        if self.position >= len(self.text):  # если наша позиция в тексе выходит за его рамки (текста)
+            self.current_char = None  # то символ который мы обрабатываем равен None
+        else:
+            self.current_char = self.text[self.position]  # иначе self.символ_для_обработки = self.код[позиция_в_коде]
+
     def peekPosition(self, lookhead: int = 1):
         peek_position = self.position + lookhead
         if peek_position >= len(self.text):
@@ -82,6 +99,23 @@ class AxiomLexer:
         if self.current_char == '\n':
             self.advance()
 
+    def read_code_block(self):
+        result = []
+        while self.current_char is not None:
+
+            #print(f"DEBUG read_code_block: current_char={repr(self.current_char)}")
+
+            if self.current_char == '$' and self.peekPosition() == '}':
+                self.advance()
+                self.advance()
+                break
+            result.append(self.current_char)
+            self.advance()
+        return ''.join(result)
+
+
+
+
     def read_string_single_quotes(self):
         self.advance()  # пропускаем первую кавычку (пример -> "строка")
         result = ''
@@ -96,6 +130,7 @@ class AxiomLexer:
 
         self.advance()  # пропускаем закрывающую кавычку
         return AxiomTokenType.STRING, result
+
 
     def read_identifier(self):
         result = ''
@@ -121,8 +156,6 @@ class AxiomLexer:
 
         self.advance() # пропускаем закрывающую кавычку
         return AxiomTokenType.STRING, result
-
-
 
 
 
@@ -165,15 +198,6 @@ class AxiomLexer:
 
 
 
-    # В AxiomLexer.py добавьте:
-    def get_text_between(self, start, end):
-        """Возвращает подстроку исходного кода от позиции start до end (не включая end)"""
-        if start >= end:
-            return ""
-        return self.text[start:end]
-
-
-
     def get_next_token(self, debug: bool=False):
         while self.current_char is not None:  # пока символ который мы проверяем не равен None
             if debug == True:
@@ -183,13 +207,16 @@ class AxiomLexer:
             if self.current_char.isspace():  # если символ который мы проверяем равен пробелу
                 self.skip_whitespace()  # то мы пропускаем пробелы
 
+
+
             if self.current_char is not None and (self.current_char.isdigit() or
-                    (self.current_char == '.' and self.peekPosition() and self.peekPosition().isdigit())):
+                    (self.current_char == '.' and self.peekPosition() and self.peekPosition().isdigit())): # Числа
                 token_type, value = self.read_number()
                 return AxiomToken(token_type, value, self.line)
 
-            # -- операторы и разделители --
 
+
+            # -- операторы и разделители --
 
             if self.current_char == '+':
                 self.advance()
@@ -295,6 +322,19 @@ class AxiomLexer:
                 return AxiomToken(AxiomTokenType.GREATER, line=self.line)
 
 
+            if self.current_char == '{':
+                self.advance()
+                if self.current_char == '$':
+                    self.advance()
+                    code = self.read_code_block()
+                    return AxiomToken(AxiomTokenType.CODE_BLOCK, value=code, line=self.line)
+
+                return AxiomToken(AxiomTokenType.LBRACE, line=self.line)
+
+            if self.current_char == '}':
+                self.advance()
+                return AxiomToken(AxiomTokenType.RBRACE, line=self.line)
+
 
             if self.current_char == ';':
                 self.advance()
@@ -315,14 +355,6 @@ class AxiomLexer:
             if self.current_char == ')':
                 self.advance()
                 return AxiomToken(AxiomTokenType.RPAREN, line=self.line)
-
-            if self.current_char == '{':
-                self.advance()
-                return AxiomToken(AxiomTokenType.LBRACE, line=self.line)
-
-            if self.current_char == '}':
-                self.advance()
-                return AxiomToken(AxiomTokenType.RBRACE, line=self.line)
 
             if self.current_char == '[':
                 self.advance()
@@ -355,7 +387,7 @@ class AxiomLexer:
 
             if self.current_char == "#":  # если символ который мы проверяем равен символу комментария (я сделал 2 символа комментариев)
                 self.skip_comment()  # то мы вызываем функцию для пропуска коммментов
-                continue  # continue начинает цикл заново с нового символа. Это гарантирует, что после пропуска пробелов/комментариев мы обработаем следующий значимый символ
+                continue # continue начинает цикл заново с нового символа. Это гарантирует, что после пропуска пробелов/комментариев мы обработаем следующий значимый символ
 
 
             if self.current_char is not None and (self.current_char.isalpha() or self.current_char == '_'):
@@ -374,5 +406,23 @@ class AxiomLexer:
                 # Обычный идентификатор (если ничего не нашли возвращаем их название)
                 return AxiomToken(AxiomTokenType.IDENTIFIER, identifier, self.line)
 
+            else:
+                self.error(f"Unexpected character: {repr(self.current_char)} (code {ord(self.current_char)})")
+
+
         return AxiomToken(AxiomTokenType.EOF, line=self.line)
 
+
+
+if __name__ == '__main__':
+    code = """
+        block python {$
+        a = 1
+        print(a)
+    $}
+    
+    
+    """
+
+    lexer = AxiomLexer(code)
+    tokens = []

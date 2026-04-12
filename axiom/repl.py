@@ -10,7 +10,7 @@ from axiom import __version__
 
 
 def repl():
-    interpreter = AxiomInterpreter
+    interpreter = AxiomInterpreter()
     print("Axiom REPL (type 'exit' to quit)")
     print(f"Version {__version__}")
 

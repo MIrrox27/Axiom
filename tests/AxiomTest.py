@@ -7,6 +7,7 @@ from axiom.AxiomASTNodes import *
 from axiom.AxiomParser import AxiomParser
 from axiom.AxiomInterpreter import *
 
+
 class Tests:
     def __init__(self):
         self.test_code = '''
@@ -16,36 +17,35 @@ class Tests:
         var name = "Василий"
         var active = true
         var inactive = false
-        
+
         # Арифметические операции
         val sum = x + 10
         val power = 2 ** 3
         val remainder = 10 % 3
-        
+
         # Условный оператор
         if x > 5 {
             print "x больше 5"
         } else {
             print "x меньше или равно 5"
         }
-        
+
         # Цикл
         cg i = 0
         while i < 3 {
             print "Итерация: " + i
             i = i + 1
         }
-        
+
         # Вызов функции (объявление)
         fun greet(person) {
             print "Привет, " + person
         }
-        
+
         # Использование функции
         greet(name)
-        
-        '''
 
+        '''
 
     def test_lexer_complete(self):
         print("=" * 60)
@@ -84,7 +84,6 @@ class Tests:
 
         return tokens
 
-
     def test_lexer_edge_cases(self):
         print("\n" + "=" * 60)
         print("ТЕСТИРОВАНИЕ ПОГРАНИЧНЫХ СЛУЧАЕВ")
@@ -110,7 +109,6 @@ class Tests:
                 if token.type == AxiomTokenType.EOF:
                     break
 
-
     def test_AST(self):
         # TODO: сделать оформление
 
@@ -132,7 +130,6 @@ class Tests:
             right=Literal(3)
         )
 
-
         expression = BinaryOp(
             left=Identifier("x"),
             operator="+",
@@ -151,11 +148,9 @@ class Tests:
 
         print('=' * 60)
 
-
-
     def test_parser(self):
         # TODO: сделать оформление
-            # СЧЕТЧИКИ:
+        # СЧЕТЧИКИ:
         instructions_err = 0
 
         lexer = AxiomLexer("x + 5")
@@ -189,7 +184,6 @@ class Tests:
             ("x + 5; # комментарий", "ExpressionStmt с выражением x + 5"),
             ("42; // тоже комментарий", "ExpressionStmt с литералом 42"),
 
-
             # Пустая инструкция
             (";", "EmptyStmt"),
         ]
@@ -221,10 +215,9 @@ class Tests:
         print("ТЕСТИРОВАНИЕ ЦИКЛОВ")
         print("=" * 60)
         """     На данном этапе я не подключил обработку var и val
-        
-        
-                                        """
 
+
+                                        """
 
         test_cases = [
             # WHILE
@@ -256,13 +249,10 @@ class Tests:
                 else:
                     print(" Весь код разобран")
             except Exception as e:
-                if str(e) != "[Parser Error]: Received AxiomTokenType.PRINT": # временно пропускаем ошибку с отсутствием функции
+                if str(e) != "[Parser Error]: Received AxiomTokenType.PRINT":  # временно пропускаем ошибку с отсутствием функции
                     print(f" Ошибка: {e}")
                 else:
                     print(" Весь код разобран")
-
-
-
 
     def test_if_parsing(self):
         print("ТЕСТИРОВАНИЕ ПАРСИНГА IF-ELIF-ELSE")
@@ -287,7 +277,8 @@ class Tests:
             ('if x > 5 {}', "пустой then-блок"),
             # Только if, без точки с запятой (блок сам по себе)
             ('if x > 5 { var a = 10; }', "if с объявлением переменной"),
-            ('if x == 5 { if x > 5 { val value = "value 123 ;1;1 != тест "; } elif x == 5 { val value = "value 123 ;1;1 != тест "; } else { var = "ест на символы {elif x == 5 { val value = "value 123 ;1;1 != тест "; }}" } }', "вложенные условия")
+            ('if x == 5 { if x > 5 { val value = "value 123 ;1;1 != тест "; } elif x == 5 { val value = "value 123 ;1;1 != тест "; } else { var = "ест на символы {elif x == 5 { val value = "value 123 ;1;1 != тест "; }}" } }',
+             "вложенные условия")
         ]
 
         for code, description in test_cases:
@@ -309,7 +300,7 @@ class Tests:
                     print("+Весь код разобран")
 
             except Exception as e:
-                if str(e) != "[Parser Error]: Received AxiomTokenType.PRINT": # временно пропускаем ошибки с неизвестными функциями
+                if str(e) != "[Parser Error]: Received AxiomTokenType.PRINT":  # временно пропускаем ошибки с неизвестными функциями
                     err += 1
                     print(f"----Ошибка: {e}")
 
@@ -332,13 +323,12 @@ class Tests:
             try:
                 ast = parser.parse_statement()
                 print(f"-----Ошибка не обнаружена! AST: {ast}")
-                err+=1
+                err += 1
             except Exception as e:
                 good_err += 1
                 print(f"-----Ожидаемая ошибка: {e}")
 
         print(f'\n>> Ожидаемые ошибки: {good_err} \n>> Непроверенные токены: {tokens} \n>> Неизвестные ошибки: {err}')
-
 
     def test_parser_full(self):
         # ------------------ ПОЗИТИВНЫЕ ТЕСТЫ (должны парситься без ошибок) ------------------
@@ -399,7 +389,6 @@ class Tests:
 
         print(f"[v] Все позитивные тесты пройдены ({len(positive_tests)})")
 
-
         negative_tests = [
             # Ожидаемая ошибка: синтаксическая
             ("var x = ;", "переменная без выражения"),
@@ -429,11 +418,6 @@ class Tests:
         print(f"[v] Все негативные тесты пройдены ({len(negative_tests)})")
 
         print("\n[V] Все тесты парсера успешно пройдены!")
-
-
-
-
-
 
 
 class TestInterpreter(AxiomInterpreter):
@@ -488,8 +472,8 @@ def run_test(code, expected_output=None, expected_error=None):
     # Возвращаем интерпретатор для дополнительных проверок (например, значений переменных)
     return interpreter
 
+    # Общие тесты интерпретатора
 
-        # Общие тесты интерпретатора
 
 def test_arithmetic():
     code = """
@@ -641,7 +625,6 @@ def _test_all():
 
 # Запуск теста
 if __name__ == "__main__":
-
     test = Tests()
     test.test_lexer_complete()
     test.test_lexer_edge_cases()

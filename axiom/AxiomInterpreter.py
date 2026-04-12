@@ -3,6 +3,8 @@
 
 from axiom.AxiomASTNodes import *
 from axiom.AxiomTokens import *
+from axiom.AxiomPythonNamespace import namespace as py_namespace
+
 
 class Error:
     def __init__(self, module):
@@ -650,53 +652,64 @@ class AxiomInterpreter: # класс интерпретатора
         # ---Блоки кода---
     def visit_PythonBlock(self, node): # Выполняет блок кода на Python.
         func = 'visit_PythonBlock'
+        namespace = py_namespace.copy()
 
-        # Создаём чистое пространство имён
-        namespace = {
-            # Стандартные функции Python
-            'print': print,
-            'len': len,
-            'str': str,
-            'int': int,
-            'float': float,
-            'bool': bool,
-            'list': list,
-            'dict': dict,
-            'tuple': tuple,
-            'set': set,
-            'type': type,
-            'range': range,
-            'sum': sum,
-            'min': min,
-            'max': max,
-            'abs': abs,
-            'round': round,
-            'sorted': sorted,
-        }
+        for  var_name, var_info in self._get_all_variables(self.env).items():
+            value = var_info['value']
+            if isinstance(value, (int, float, str, bool, type(None))):
+                namespace[var_name] = value
+            elif isinstance(value, Callable) and hasattr(value, 'func'):
+                namespace[var_name] = value.func
 
+        # Удаляем общий отступ из кода (dedent)
+        code_lines = node.code.splitlines()
+        min_indent = None
+        for line in code_lines:
+            stripped = line.lstrip()
+            if stripped:
+                indent = len(line) - len(stripped)
+                if min_indent is None or indent < min_indent:
+                    min_indent = indent
+
+        if min_indent is not None and min_indent > 0:
+            dedented_lines = []
+            for line in code_lines:
+                if line.strip():
+                    dedented_lines.append(line[min_indent:])
+                else:
+                    dedented_lines.append(line)
+            code = '\n'.join(dedented_lines)
+        else:
+            code = node.code
 
         try:
-            exec(node.code, namespace)
+
+            exec(code, namespace)
         except Exception as e:
+            # Для отладки можно вывести полный traceback
+            import traceback
+            traceback.print_exc()
             self.error.raise_error(
-                f"Error executing Python block: {str(e)}",
+                f"Error executing Python block: {str(e)}\nCode:\n{code}",
                 func
             )
 
-        # Обработка выходных переменных
         if node.outputs:
             result = []
-            for output in node.outputs:
-                if output in namespace:
-                    result.append(namespace[output])
+            for out in node.outputs:
+                if out in namespace:
+                    result.append(namespace[out])
+
                 else:
-                    self.error.raise_error(
-                        f"Output variable '{output}' not defined in Python block",
-                        func
-                    )
+                    result.append(None)
+
             return result[0] if len(result) == 1 else result
+
         else:
             return None
+
+
+
 
 
 

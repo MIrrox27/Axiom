@@ -1,0 +1,30 @@
+    # Пример калькулятора
+
+fun calc(num1, op, num2){
+
+    if op == '+'{
+        return num1 + num2;
+    }
+    elif op == '-'{
+        return num1 - num2;
+    }
+
+    elif op == '*'{
+        return num1 * num2;
+    }
+
+    elif op == '/'{
+        return num1 / num2;
+    }
+
+    else{print("Неизвестный символ")}
+
+}
+
+
+var num1 = int(input("Введите первое число: ")) // Сразу переводим число в численный формат
+var op = input("Введите знак (+, -, *, /): ")
+var num2 = int(input("Введите второе число: "))
+
+
+print(calc(num1, op, num2)) // Вызываем функцию и выводим то, что она возвращает

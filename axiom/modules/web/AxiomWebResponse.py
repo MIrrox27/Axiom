@@ -5,7 +5,7 @@
 from axiom.modules.web.AxiomWebModule import *
 import json
 
-class Response:
+class Response: # ответ сервера
     def __init__(self, status, headers, body):
         self.status = status
         self.headers = headers

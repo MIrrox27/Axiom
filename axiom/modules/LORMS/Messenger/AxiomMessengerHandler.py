@@ -32,8 +32,15 @@ class MessengerHandlerHTTPChat(BaseHTTPRequestHandler):
             self.send_error(404, "File Not Found")
 
 
-    def do_POST(self):
-        pass
+    def _send_headers(self):
+        self.send_response()
+
+
+
+
+
+    def do_POST(self): pass
+
 
 
 

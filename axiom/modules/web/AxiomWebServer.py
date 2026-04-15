@@ -4,7 +4,7 @@ from axiom.modules.web.AxiomWebModule import WebHandler, Output
 from http.server import HTTPServer
 
 
-class ServerModule(WebHandler):
+class ServerModule():
     def __init__(self):
         self.output = Output('ServerModule')
 

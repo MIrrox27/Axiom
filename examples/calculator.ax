@@ -1,6 +1,6 @@
     # Пример калькулятора
 
-fun calc(num1, op, num2){
+fun calc(num1, op, num2){ // можно обойтись и без функции
 
     if op == '+'{
         return num1 + num2;

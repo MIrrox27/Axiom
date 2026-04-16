@@ -206,6 +206,7 @@ class AxiomLexer:
 
             if self.current_char.isspace():  # если символ который мы проверяем равен пробелу
                 self.skip_whitespace()  # то мы пропускаем пробелы
+                continue
 
 
 

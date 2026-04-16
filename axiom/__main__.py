@@ -36,8 +36,12 @@ def run_file(filename):
 
     try:
         while parser.current_token.type != AxiomTokenType.EOF:
+            #print(f"DEBUG: Current token before parse: {parser.current_token}")
             stmt = parser.parse_statement()
             interpreter.visit(stmt)
+
+        if parser.current_token.type != AxiomTokenType.EOF:
+            raise Exception("Parsing did not consume all tokens")
 
     except Exception as e:
 

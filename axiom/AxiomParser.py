@@ -635,6 +635,8 @@ class AxiomParser:
     def parse_statement(self):
         token = self.current_token
 
+
+
         if token.type == AxiomTokenType.SEMICOLON:
             self.eat(AxiomTokenType.SEMICOLON)
             return EmtpyStmt

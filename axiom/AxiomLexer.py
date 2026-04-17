@@ -37,8 +37,8 @@ class AxiomLexer:
             'True': AxiomTokenType.BOOL,
             'False': AxiomTokenType.BOOL,
 
-            #'class': AxiomTokenType.CLASS,
-            #'enum': AxiomTokenType.ENUM,
+            'class': AxiomTokenType.CLASS,
+            'enum': AxiomTokenType.ENUM,
 
             #'script': AxiomTokenType.SCRIPT,
             #'config': AxiomTokenType.CONFIG,

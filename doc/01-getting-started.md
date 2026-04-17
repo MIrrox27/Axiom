@@ -1,3 +1,4 @@
+
 <div align="center">
     <h1>Начало работы</h1>
 </div>
@@ -61,9 +62,13 @@ axiom \path\to\your\file
 <table>
 <tr><td width=33% valign=top>
 
-* [О языке](#о-языке)
-* [Шаги по установке](#шаги-по-установке-windows)
-* [Первая программа](#первая-программа)
+* [Начало работы](https://github.com/MIrrox27/Axiom/blob/main/doc/01-getting-started.md)
+  * [О языке](#о-языке)
+  * [Шаги по установке](#шаги-по-установке-windows)
+  * [Первая программа](#первая-программа)
+  
+
+* [Синтаксис](https://github.com/MIrrox27/Axiom/blob/main/doc/02-syntax.md)
 
 
 </table>

@@ -100,11 +100,11 @@ class VarDeclaration(Statement): # объявление переменных и 
 
 
 
-class ListNode(Statement): # список val/var: literal __name__ [length] = [value1, value2, value3]
+class ListNode(Expression): # список val/var: literal __name__ [length] = [value1, value2, value3]
     """
                 В планах осуществить несколько вариантов объявления списка:
 
-            1) val/var: (literal) __name__ [length] = {'key1': value1, 'key2': value2} - длинный способ с полным указанием всех параметров
+            1) val/var: (literal) __name__ [length] = [value1, value2, value3] - длинный способ с полным указанием всех параметров
              и строгой типизацией значения
              (изменчивость: (тип данных значения), имя, длина).
 
@@ -118,16 +118,16 @@ class ListNode(Statement): # список val/var: literal __name__ [length] = [
             мб потом добавлю закрепление длины, допустим в виде [const:length]
 
 
-            2) val/var __name__ [length] = {'key1': value1, 'key2': value2} - более короткий способ без указания типов данных для ключа и значения
+            2) val/var __name__ [length] = [value1, value2, value3] - более короткий способ без указания типов данных для ключа и значения
             (изменчивость имя, длина)
 
 
-            3) val/var __name__ = {'key1': value1, 'key2': value2} - самый короткий способ, все параметры изменяемые.
+            3) val/var __name__ = [value1, value2, value3] - самый короткий способ, все параметры изменяемые.
 
             Добавление данной функции планируется после создания рабочего прототипа интерпритатора.
         """
 
-    def __init__(self, keyword, literal, value, length):
+    def __init__(self, keyword, literal, values, length):
         self.error = Error('ListNode')
 
         if keyword in (AxiomTokenType.VAL, AxiomTokenType.VAR):
@@ -135,12 +135,12 @@ class ListNode(Statement): # список val/var: literal __name__ [length] = [
         else: self.error.error(f"you can't use type '{keyword.type}' in list")
 
         self.literal = literal
-        self.value = value
+        self.values = values
         self.length = length
 
 
 
-class DictNode(Statement): # словарь
+class DictNode(Expression): # словарь
     """
             В планах осуществить несколько вариантов объявления словаря:
 
@@ -178,6 +178,13 @@ class DictNode(Statement): # словарь
         self.key = key
         self.value = value
         self.length = length
+
+
+class IndexAccess(Expression):
+    def __init__(self, obj, index):
+        self.obj = obj
+        self.index = index
+
 
 
 

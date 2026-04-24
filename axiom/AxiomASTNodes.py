@@ -127,16 +127,16 @@ class ListNode(Expression): # список val/var: literal __name__ [length] = 
             Добавление данной функции планируется после создания рабочего прототипа интерпритатора.
         """
 
-    def __init__(self, keyword, literal, values, length):
-        self.error = Error('ListNode')
+    def __init__(self, elements): #(self, keyword, literal, elements, length):
+        #self.error = Error('ListNode')
 
-        if keyword in (AxiomTokenType.VAL, AxiomTokenType.VAR):
-            self.changeable = True if keyword.type == AxiomTokenType.VAR else False
-        else: self.error.error(f"you can't use type '{keyword.type}' in list")
+        #if keyword in (AxiomTokenType.VAL, AxiomTokenType.VAR):
+            #self.changeable = True if keyword.type == AxiomTokenType.VAR else False
+        #else: self.error.error(f"you can't use type '{keyword.type}' in list")
 
-        self.literal = literal
-        self.values = values
-        self.length = length
+        #self.literal = literal
+        self.elements = elements # список узлов Expression
+        #self.length = length
 
 
 

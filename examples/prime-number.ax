@@ -1,8 +1,6 @@
 
     # Пример кода для определения простое ли число или нет
 
-
-
 var num = int(input("Введите число от 1 до 1000: "))
 var is_prime = False
 print(is_prime)

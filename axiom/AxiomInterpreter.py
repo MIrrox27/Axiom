@@ -298,6 +298,27 @@ class AxiomInterpreter: # класс интерпретатора
         return None
 
 
+    def visit_ListNode(self, node):
+        return [self.visit(elem) for elem in node.elements]
+
+
+    def visit_IndexAccess(self, node):
+        func = 'visit_IndexAccess'
+
+        obj = self.visit(node.obj)
+        index = self.visit(node.index)
+        if not isinstance(obj, (list, dict, str)):
+            self.error.raise_error(f"Cannot index type {type(obj).__name__}", func)
+
+        try:
+            return obj[index]
+        except IndexError:
+            self.error.raise_error(f"Index {index} out of range", func)
+        except KeyError:
+            self.error.raise_error(f"Key {index} not found", func)
+
+
+
 
     def visit_EmtpyStmt(self, node):
         return None

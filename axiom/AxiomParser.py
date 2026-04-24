@@ -67,9 +67,16 @@ class AxiomParser:
         elif token.type == AxiomTokenType.BLOCK:
             return self.parse_python_block() # здесь сделаю проверки для других языков программирования
 
+
         elif token.type == AxiomTokenType.IDENTIFIER:
             self.eat(token.type)
             node = Identifier(token.value)
+
+            while self.current_token.type == AxiomTokenType.LBRACKET: # Для цепочек доступа, например matrix[0][1]
+                self.eat(AxiomTokenType.LBRACKET)
+                index_expr = self.parse_expression()
+                self.eat(AxiomTokenType.RBRACKET)
+                node = IndexAccess(node, index_expr)
 
             if self.current_token.type == AxiomTokenType.INCREMENT:
                 self.eat(AxiomTokenType.INCREMENT)
@@ -350,6 +357,34 @@ class AxiomParser:
             self.eat(AxiomTokenType.SEMICOLON)
 
         return  VarDeclaration(keyword_token.type, name=name, value=value)
+
+
+
+            # ----- КОЛЛЕКЦИИ -----
+
+    def parse_list(self):
+        self.eat(AxiomTokenType.LBRACKET)
+        elements = []
+        if self.current_token.type != AxiomTokenType.RBRACKET:
+            while True:
+                elem = self.parse_expression()
+                elements.append(elem)
+
+                if self.current_token.type == AxiomTokenType.COMMA:
+                    self.eat(AxiomTokenType.COMMA)
+                    continue
+
+                elif self.current_token.type == AxiomTokenType.RBRACKET:
+                    break
+
+                else:
+                    self.error("Expected ',' or ']' in list", 'parse_list')
+
+        self.eat(AxiomTokenType.RBRACKET)
+        return ListNode(elements)
+
+
+
 
 
 
@@ -636,7 +671,6 @@ class AxiomParser:
         token = self.current_token
 
 
-
         if token.type == AxiomTokenType.SEMICOLON:
             self.eat(AxiomTokenType.SEMICOLON)
             return EmtpyStmt
@@ -649,6 +683,9 @@ class AxiomParser:
 
         elif token.type == AxiomTokenType.LBRACE:
             return self.parse_block() # функция, которая будет парсить блоки кода, у нас они находятся в {}
+
+        elif token.type == AxiomTokenType.LBRACKET:
+            return self.parse_list()
 
         elif token.type in (AxiomTokenType.VAL, AxiomTokenType.VAR):
             return self.parse_var_declaration()

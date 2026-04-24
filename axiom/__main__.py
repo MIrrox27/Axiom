@@ -3,16 +3,35 @@
 
 import sys
 import os
+import _sitebuiltins
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from axiom.AxiomTokens import *
 from axiom.AxiomLexer import *
 from axiom.AxiomParser import *
-    # from axiom.AxiomASTNodes import *
+# from axiom.AxiomASTNodes import *
 from axiom.AxiomInterpreter import *
 
 from axiom.repl import repl
+
+
+
+
+
+# Восстанавливаем функции, которые удаляет PyInstaller
+help = _sitebuiltins._Helper()  # Восстанавливаем команду 'help'
+quit = _sitebuiltins.Quitter('quit', 'exit')  # Восстанавливаем 'quit' и 'exit'
+license = _sitebuiltins._Printer('license',
+    'See https://www.python.org/psf/license/',
+    ['_sitebuiltins', '__doc__'])
+
+# Важно: добавляем их в модуль builtins, чтобы они были доступны глобально
+import builtins
+builtins.help = help
+builtins.quit = quit
+builtins.exit = quit
+builtins.license = license
 
 
 
@@ -36,7 +55,7 @@ def run_file(filename):
 
     try:
         while parser.current_token.type != AxiomTokenType.EOF:
-            #print(f"DEBUG: Current token before parse: {parser.current_token}")
+            #2ц print(f"DEBUG: Current token before parse: {parser.current_token}")
             stmt = parser.parse_statement()
             interpreter.visit(stmt)
 

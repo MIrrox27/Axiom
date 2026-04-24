@@ -39,7 +39,7 @@ namespace = {
     'globals': globals,
     'hasattr': hasattr,
     'hash': hash,
-    'help': help,
+   # 'help': help,
     'hex': hex,
     'id': id,
     'input': input,

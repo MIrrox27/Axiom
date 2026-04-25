@@ -166,6 +166,7 @@ class AxiomInterpreter: # класс интерпретатора
 
         def print_func(*args):  # print выводит значения через пробел
             output = ' '.join(str(arg) for arg in args)
+            #print(f"DEBUG: print called with args={args}, output={output}")  # временно
             print(output)
             return None
         self.global_env.define('print', Callable('print', -1, print_func)) # регистрируем функцию
@@ -299,6 +300,7 @@ class AxiomInterpreter: # класс интерпретатора
 
 
     def visit_ListNode(self, node):
+        #print(f"DEBUG: visit_ListNode called with {len(node.elements)} elements")
         return [self.visit(elem) for elem in node.elements]
 
 

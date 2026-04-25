@@ -31,8 +31,6 @@ class AxiomTokenType(Enum):
     DO = 'DO' # Цикл do (образован от цикла do while), первый раз выполняется всегда, потом по условию
     FOR = "FOR"  # Цикл for: for
     FOREACH = "FOREACH" # Цикл foreach: foreach(variable in collection)
-    PRINT = 'PRINT'  # Вывод на печать: print(value)
-    INPUT = 'INPUT'
     #AXIOM = "AXIOM" # Еще не придумал
     RETURN = 'RETURN' # Возврат значения: return
     IS = 'IS' # Ключевое слово is

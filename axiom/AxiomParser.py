@@ -3,7 +3,7 @@
 
 
 from axiom.AxiomASTNodes import *
-from axiom.AxiomLexer import AxiomLexer
+# from axiom.AxiomLexer import AxiomLexer
 from  axiom.AxiomTokens import AxiomTokenType
 
 
@@ -46,7 +46,7 @@ class AxiomParser:
 
     def parse_primary(self):  # Парсит первичные выражения. Возвращает узел AST
         token = self.current_token
-
+        #print(f'[parse_primary]: token - {token}')
         # типы данных
         if token.type in (AxiomTokenType.INTEGER, AxiomTokenType.FLOAT): #
             self.eat(token.type)
@@ -67,6 +67,9 @@ class AxiomParser:
         elif token.type == AxiomTokenType.BLOCK:
             return self.parse_python_block() # здесь сделаю проверки для других языков программирования
 
+        elif token.type == AxiomTokenType.LBRACKET:
+            return self.parse_list()
+
 
         elif token.type == AxiomTokenType.IDENTIFIER:
             self.eat(token.type)
@@ -78,9 +81,14 @@ class AxiomParser:
                 self.eat(AxiomTokenType.RBRACKET)
                 node = IndexAccess(node, index_expr)
 
+
+
             if self.current_token.type == AxiomTokenType.INCREMENT:
                 self.eat(AxiomTokenType.INCREMENT)
                 return UnaryOp(operator=AxiomTokenType.POST_INCREMENT, expr=node)
+
+            elif self.current_token.type == AxiomTokenType.LPAREN:  # <--- ДОБАВИТЬ ЭТУ СТРОКУ
+                return self.parse_call(node)
 
 
             elif self.current_token.type == AxiomTokenType.DECREMENT:
@@ -90,10 +98,6 @@ class AxiomParser:
 
             elif self.current_token.type == AxiomTokenType.DOT:
                 return self.parse_member_access(node)
-
-
-            elif self.current_token.type == AxiomTokenType.LPAREN:
-                return self.parse_call(node)
 
 
             return node
@@ -112,11 +116,6 @@ class AxiomParser:
             self.eat(AxiomTokenType.RBRACE) #
             return node
 
-        elif token.type == AxiomTokenType.LBRACKET:
-            self.eat(AxiomTokenType.LBRACKET)  #
-            node = self.parse_expression()     # Рекурсивно парсим выражение внутри
-            self.eat(AxiomTokenType.RBRACKET)  #
-            return node
 
         else:
             self.error(f"Received {token.type}", func='parse_primary')
@@ -365,7 +364,9 @@ class AxiomParser:
     def parse_list(self):
         self.eat(AxiomTokenType.LBRACKET)
         elements = []
+
         if self.current_token.type != AxiomTokenType.RBRACKET:
+
             while True:
                 elem = self.parse_expression()
                 elements.append(elem)
@@ -683,9 +684,6 @@ class AxiomParser:
 
         elif token.type == AxiomTokenType.LBRACE:
             return self.parse_block() # функция, которая будет парсить блоки кода, у нас они находятся в {}
-
-        elif token.type == AxiomTokenType.LBRACKET:
-            return self.parse_list()
 
         elif token.type in (AxiomTokenType.VAL, AxiomTokenType.VAR):
             return self.parse_var_declaration()

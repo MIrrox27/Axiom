@@ -188,12 +188,6 @@ class IndexAccess(Expression):
 
 
 
-class IndexAccess(Statement): # Класс для обращения по индексу
-    def __init__(self, index):
-        self.index = index
-
-
-
 class Block(Statement): # блок кода
     def __init__(self, statements):
         self.statements = statements

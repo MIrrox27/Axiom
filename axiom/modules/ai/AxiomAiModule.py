@@ -124,6 +124,26 @@ class Response(Client):
 
 
 
+if __name__ == '__main__':
+    ai = Ai( # делаем модель для ии
+        model=MODEL_NAME,
+        temperature=0.5,
+        max_tokens=400,
+        stream=False
+    )
+
+    context = [
+    {"role": "system", "content": "Ты — ассистент, который помогает школьникам."},
+    {"role": "user", "content": "Объясни, что такое рекурсия, простыми словами."}
+]
+
+    client = Client(api=MODEL_TOKEN, base_url=MODEL_URL, context=context, ai=ai)
+    msg = None
+    while msg != 'q':
+        msg = input('Вы: ')
+        response = Response(client, msg)
+        out = response.send_response()
+        print("Нейросеть: ", out)
 
 
 

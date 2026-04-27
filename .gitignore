@@ -11,3 +11,5 @@ axiom.exe
 
 tests/mini_test.py
 tests/test_web.py
+
+axiom/modules/ai/api.py

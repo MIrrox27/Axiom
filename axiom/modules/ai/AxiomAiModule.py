@@ -44,7 +44,14 @@ class AiModule:
 
 
 class Ai(AiModule):
-    def __init__(self, model, temperature=0.5, max_tokens=250, stream=False):
+    def __init__(self, model=None, temperature=0.5, max_tokens=250, stream=False):
+        self.model = model
+        self.temperature = temperature
+        self.max_tokens = max_tokens
+        self.stream = stream
+
+
+    def set_model(self, model, temperature, max_tokens, stream): # функция в Axiom для создания модели
         self.model = model
         self.temperature = temperature
         self.max_tokens = max_tokens
@@ -53,7 +60,7 @@ class Ai(AiModule):
 
 
 class Client(AiModule): # класс для отправки запросов, хранения контекста
-    def __init__(self, api, base_url, context, ai):
+    def __init__(self, api=None, base_url=None, context=None, ai=None):
         self.api = api
         self.base_url = base_url
         self.context = context
@@ -67,6 +74,41 @@ class Client(AiModule): # класс для отправки запросов, �
             base_url=self.base_url,
             api_key=self.api
         )
+
+    def set_client(self, api, base_url, context): # функция в Axiom для создания клиента
+        self.api = api
+        self.base_url = base_url
+        self.context = context
+
+        self.client = OpenAI(
+            base_url=self.base_url,
+            api_key=self.api
+        )
+
+
+
+    def reset_context(self, new_context): # функция в Axiom для обновления контекста
+        self.context = new_context
+
+
+
+    def add_to_context(self, messages):
+        func = 'add_to_context'
+
+        if isinstance(messages, (int, str, float)):
+            self.client.context.append({
+            'role': 'user',
+            'content': str(messages)
+            })
+
+        elif isinstance(messages, dict):
+            self.client.context.append(messages)
+
+        else:
+            self.error.raise_error(f'Invalid message format: {messages}', func=func)
+
+
+
 
 
 
@@ -116,6 +158,7 @@ class Response(Client):
             })
 
         return bot_answer
+
 
 
 

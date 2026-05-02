@@ -267,6 +267,69 @@ class AxiomInterpreter: # класс интерпретатора
         pass
 
 
+            # ----- AI -----
+
+    def _register_ai_functions(self, module):
+        from axiom.modules.ai.AxiomAiModule import AiModule, Ai, Client, Response
+
+        module_name = module.name
+
+        """
+            Ai модуль:
+            
+                В этом модуле я планирую реализовать несколько основных вещей (без использования классов в языке Axiom):
+                
+                    1) Возможность создать модель
+                    
+                    2) Возможность создавать клиент        
+                    
+                    3) Отправлять запросы к нейросети
+                    
+                    4) Изменять контекст 1 строчкой кода
+                    
+                    5) Получать данные клиента и модели
+                    
+                На данный момент я придумал только как реализовать работу с 1 клиентом и 1 моделью, 
+                поэтому (пока) пользователи не смогут работать с большим количеством моделей, но для создания 
+                простых чат ботов этого достаточно.
+                
+                Для полноценной работы модуля мне придется добавить словари, но на начальном этапе 
+                они будут не такими функциональными как я описывал в файле AxiomASTNodes.py. Реализацией словарей я займусь
+                после Ai модуля
+        
+        """
+
+        ai = Ai()
+        client = Client()
+
+        def set_model_func(model, temperature, max_tokens, stream):
+            ai.set_model(
+                model,
+                temperature,
+                max_tokens,
+                stream
+                )
+
+        module.define('set_model', Callable(f'{module_name}.set_model', 4, set_model_func))
+
+        def set_client_func(api, base_url, context):
+            client.set_client(
+                api,
+                base_url,
+                context
+            )
+        module.define('set_client', Callable(f'{module_name}.set_client', 3, set_client_func))
+
+        def reset_context_func(new_context):
+            client.reset_context(new_context)
+
+        module.define('reset_context', Callable(f'{module_name}.reset_context', 1, reset_context_func))
+
+
+
+
+
+
             # -----visit_------
 
     def visit(self, node): # основной метод создания

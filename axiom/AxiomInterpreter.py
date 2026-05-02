@@ -214,6 +214,10 @@ class AxiomInterpreter: # класс интерпретатора
         self._register_math_functions(math_module)
         self.modules['math'] = math_module
 
+        ai_module = Module('ai')
+        self._register_ai_functions(ai_module)
+        self.modules['ai'] = ai_module
+
 
 
         # ---MATH---

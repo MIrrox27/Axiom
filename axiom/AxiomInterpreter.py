@@ -258,7 +258,7 @@ class AxiomInterpreter: # класс интерпретатора
 
             # ----- WEB -----
 
-    def register_web_functions(self, module):
+    def _register_web_functions(self, module):
         #from axiom.modules.web import *
         pass
 

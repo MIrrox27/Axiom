@@ -303,7 +303,7 @@ class AxiomInterpreter: # класс интерпретатора
         """
 
         ai = Ai()
-        client = Client()
+        client = Client(ai=ai)
 
         """
             У меня появилась идея как реализовать работу с большим количеством клиентов, функция set_client будет

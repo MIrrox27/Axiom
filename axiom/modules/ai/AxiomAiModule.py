@@ -79,10 +79,10 @@ class Client(AiModule): # класс для отправки запросов, �
         self.max_tokens = ai.max_tokens
         self.stream = ai.stream
 
-        self.client = OpenAI(
-            base_url=self.base_url,
-            api_key=self.api
-        )
+        #self.client = OpenAI(
+            #base_url=self.base_url,
+           # api_key=self.api
+        #)
 
     def set_client(self, api, base_url, context): # функция в Axiom для создания клиента
         self.api = api

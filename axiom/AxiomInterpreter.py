@@ -267,6 +267,7 @@ class AxiomInterpreter: # класс интерпретатора
         pass
 
 
+
             # ----- AI -----
 
     def _register_ai_functions(self, module):
@@ -291,7 +292,9 @@ class AxiomInterpreter: # класс интерпретатора
                     
                 На данный момент я придумал только как реализовать работу с 1 клиентом и 1 моделью, 
                 поэтому (пока) пользователи не смогут работать с большим количеством моделей, но для создания 
-                простых чат ботов этого достаточно.
+                простых чат ботов этого достаточно. 
+                
+                
                 
                 Для полноценной работы модуля мне придется добавить словари, но на начальном этапе 
                 они будут не такими функциональными как я описывал в файле AxiomASTNodes.py. Реализацией словарей я займусь
@@ -332,17 +335,34 @@ class AxiomInterpreter: # класс интерпретатора
         def get_client_func(): # Получить данные клиента
             return client.get_client()
 
-        def reset_context_func(new_context):
+
+        def reset_context_func(new_context): # Перезапись контекста
             return client.reset_context(new_context)
 
-        module.define('reset_context', Callable(f'{module_name}.reset_context', 1, reset_context_func))
 
-
-        def add_msg_to_context(msg):
+        def add_msg_to_context_func(msg): # Добавить сообщение в контекст, принимает строку или словарь
             return client.add_msg_to_context(msg)
 
-        module.define('add_msg_to_context', Callable(f'{module_name}.add_msg_to_context', 1, add_msg_to_context()))
 
+
+                # Регистрация функций Client
+        module.define('set_client', Callable(f'{module_name}.set_client', 3, set_client_func))
+        module.define('get_client', Callable(f'{module_name}.get_client', -1, get_client_func))
+        module.define('reset_context', Callable(f'{module_name}.reset_context', 1, reset_context_func))
+        module.define('add_msg_to_context', Callable(f'{module_name}.add_msg_to_context', 1, add_msg_to_context_func))
+
+
+
+                # --- функции Response ---
+
+        def send_msg(msg): # Функция для отправки сообщения, на вход принимает сообщение, остальная информация привязана к клиенту
+            response = Response(msg=msg, client=client)
+            bot_answer = response.send_response()
+            return bot_answer
+
+
+                # Регистрация функций Response
+        module.define('send_msg', Callable(f'{module_name}.send_msg', 1, send_msg))
 
 
 

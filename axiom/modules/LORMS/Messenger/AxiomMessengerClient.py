@@ -1,4 +1,4 @@
-# author https://github.com/MIrrox27/Axiom
+# author https://github.com/MIrrox27/Axiom-Language
 # AxiomMessengerClient.py
 
 from axiom.modules.LORMS.Messenger.AxiomMessenger import Messenger

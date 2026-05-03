@@ -1,4 +1,4 @@
-# author https://github.com/MIrrox27/Axiom
+# author https://github.com/MIrrox27/Axiom-Language
 # AxiomASTNodes.py
 
 from axiom.AxiomTokens import AxiomTokenType

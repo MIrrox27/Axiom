@@ -1,4 +1,4 @@
-# author https://github.com/MIrrox27/Axiom
+# author https://github.com/MIrrox27/Axiom-Language
 # AxiomMessengerHandler.py
 
 from http.server import HTTPServer, BaseHTTPRequestHandler

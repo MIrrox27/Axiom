@@ -1,3 +1,5 @@
+# author https://github.com/MIrrox27/Axiom-Language
+
 import re, http, requests, html, urllib
 
 class LORMSModule: # общий класс для всех модулей

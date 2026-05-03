@@ -1,4 +1,4 @@
-# author https://github.com/MIrrox27/Axiom
+# author https://github.com/MIrrox27/Axiom-Language
 # __main__.py
 
 import sys
@@ -55,7 +55,7 @@ def run_file(filename):
 
     try:
         while parser.current_token.type != AxiomTokenType.EOF:
-            #2ц print(f"DEBUG: Current token before parse: {parser.current_token}")
+            # print(f"DEBUG: Current token before parse: {parser.current_token}")
             stmt = parser.parse_statement()
             interpreter.visit(stmt)
 

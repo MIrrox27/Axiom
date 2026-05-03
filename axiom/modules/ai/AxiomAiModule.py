@@ -50,12 +50,21 @@ class Ai(AiModule):
         self.max_tokens = max_tokens
         self.stream = stream
 
+        if self.stream:
+            self.error.raise_error('Real-time data retrieval is temporarily unavailable.', '__init__')
+
 
     def set_model(self, model, temperature, max_tokens, stream): # функция в Axiom для создания модели
         self.model = model
         self.temperature = temperature
         self.max_tokens = max_tokens
         self.stream = stream
+
+        if self.stream:
+            self.error.raise_error('Real-time data retrieval is temporarily unavailable.', 'set_model')
+
+
+    def get_model(self): pass
 
 
 

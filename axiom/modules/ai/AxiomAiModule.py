@@ -186,12 +186,11 @@ if __name__ == '__main__':
         model=MODEL_NAME,
         temperature=0.5,
         max_tokens=400,
-        stream=False
+        stream=True # Ошибка
     )
 
     context = [
-    {"role": "system", "content": "Ты — ассистент, который помогает школьникам."},
-    {"role": "user", "content": "Объясни, что такое рекурсия, простыми словами."}
+    {"role": "system", "content": "Ты — ассистент, который помогает школьникам."}
 ]
 
     client = Client(api=MODEL_TOKEN, base_url=MODEL_URL, context=context, ai=ai)

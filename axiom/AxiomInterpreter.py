@@ -310,15 +310,27 @@ class AxiomInterpreter: # класс интерпретатора
                 stream
                 )
 
-        module.define('set_model', Callable(f'{module_name}.set_model', 4, set_model_func))
+        def get_model_func(): # Получить данные модели
+            return ai.get_model()
 
-        def set_client_func(api, base_url, context):
+
+                # Регистрация функций Model
+        module.define('set_model', Callable(f'{module_name}.set_model', 4, set_model_func))
+        module.define('get_model', Callable(f'{module_name}.get_model', -1, get_model_func))
+
+
+
+                # --- функции Client ---
+
+        def set_client_func(api, base_url, context): # Создать клиент
             return client.set_client(
                 api,
                 base_url,
                 context
             )
-        module.define('set_client', Callable(f'{module_name}.set_client', 3, set_client_func))
+
+        def get_client_func(): # Получить данные клиента
+            return client.get_client()
 
         def reset_context_func(new_context):
             return client.reset_context(new_context)

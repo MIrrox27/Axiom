@@ -1,4 +1,4 @@
-# author https://github.com/MIrrox27/Axiom
+# author # author https://github.com/MIrrox27/Axiom-Language
 # repl.py
 
 from axiom.AxiomTokens import *

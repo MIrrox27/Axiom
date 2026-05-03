@@ -537,7 +537,7 @@ class AxiomParser:
             self.error(f'where is "(" ?', func)
 
         iterable = self.parse_expression()
-        #self.eat(AxiomTokenType.RPAREN)
+        self.eat(AxiomTokenType.RPAREN)
         body = self.parse_block()
 
         return ForeachStmt(Identifier(var_name), iterable=iterable, body=body)

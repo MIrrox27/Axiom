@@ -303,7 +303,7 @@ class AxiomInterpreter: # класс интерпретатора
         client = Client()
 
         def set_model_func(model, temperature, max_tokens, stream):
-            ai.set_model(
+            return ai.set_model(
                 model,
                 temperature,
                 max_tokens,
@@ -313,7 +313,7 @@ class AxiomInterpreter: # класс интерпретатора
         module.define('set_model', Callable(f'{module_name}.set_model', 4, set_model_func))
 
         def set_client_func(api, base_url, context):
-            client.set_client(
+            return client.set_client(
                 api,
                 base_url,
                 context
@@ -321,11 +321,15 @@ class AxiomInterpreter: # класс интерпретатора
         module.define('set_client', Callable(f'{module_name}.set_client', 3, set_client_func))
 
         def reset_context_func(new_context):
-            client.reset_context(new_context)
+            return client.reset_context(new_context)
 
         module.define('reset_context', Callable(f'{module_name}.reset_context', 1, reset_context_func))
 
 
+        def add_msg_to_context(msg):
+            return client.add_msg_to_context(msg)
+
+        module.define('add_msg_to_context', Callable(f'{module_name}.add_msg_to_context', 1, add_msg_to_context()))
 
 
 

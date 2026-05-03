@@ -305,7 +305,17 @@ class AxiomInterpreter: # класс интерпретатора
         ai = Ai()
         client = Client()
 
-        def set_model_func(model, temperature, max_tokens, stream):
+        """
+            У меня появилась идея как реализовать работу с большим количеством клиентов, функция set_client будет
+            возвращать объект класса Client, а потом его можно будет просто подставить в любую функцию, 
+            но это я сделаю после того, как сделаю и протестирую хотя бы часть функций в этом модуле, поэтому сейчас можно 
+            работать только с 1 клиентом и 1 моделью, просто их можно перезаписывать
+        """
+
+
+                # --- функции Model ---
+
+        def set_model_func(model, temperature, max_tokens, stream): # Создать модель
             return ai.set_model(
                 model,
                 temperature,
